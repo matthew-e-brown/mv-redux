@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "target": "ES2018",
+        "module": "None",
+        "lib": [
+            "ES2023",
+            "ES2023.Array",
+            "ES2023.Collection",
+            "DOM",
+        ],
+        "rootDir": "./src",
+        "outDir": "./lib",
+        "strict": true,
+        "declaration": true,
+        "noImplicitReturns": true,
+    },
+    "include": [
+        "./src/**/*.ts",
+    ],
+}

@@ -1,0 +1,13 @@
+{
+  "name": "mv-matt",
+  "author": "Matthew Brown <matthew.e.brown.17@gmail.com>",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "Remake of matrix/vector library for COIS-4480H.",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  }
+}
