@@ -967,7 +967,6 @@ function normalize<T extends AnyVector>(v: T): T {
     }
 }
 
-
 /**
  * Mixes two vectors or two numbers together with ratio `s`.
  *
@@ -996,6 +995,176 @@ function mix<T extends AnyVector | number>(u: T, v: T, s: number): T {
     } else if (u.type == 'vec4' && v.type == 'vec4') {
         return vec4(r * u[0] + s * v[0], r * u[1] + s * v[1], r * u[2] + s * v[2], r * u[3] + s * v[3]) as T;
     } else {
-        throw new Error("Unreachable: !isVector throws error, and all vector variants return.");
+        // TS lacks the ability for union types to be mutually exclusive, so it doesn't know this
+        // branch is unreachable. https://github.com/microsoft/TypeScript/issues/27808
+        throw new Error("Unreachable: !isVector throws error, and all other branches return.");
+    }
+}
+
+// =================================================================================================
+// Matrix functions
+// =================================================================================================
+
+/**
+ * Computes the determinant of a matrix.
+ */
+function det(mat: AnyMatrix): number {
+    if (!isMatrix(mat)) {
+        throw new Error("Invalid argument passed to 'det'. Expected a matrix.");
+    } else if (mat.type == 'mat2') {
+        return mat[0][0] * mat[1][1] - mat[1][0] * mat[0][1];
+    } else if (mat.type == 'mat3') {
+        /* The determinant of a 3D matrix is equal to the scalar triple product of its 3 column
+         * vectors. See equations 1.94 and 1.95 (pg. 47-48) in Foundations of Game Dev, vol. 1. */
+        const a = vec3(mat[0]);
+        const b = vec3(mat[1]);
+        const c = vec3(mat[2]);
+        return dot(cross(a, b), c);
+    } else if (mat.type == 'mat4') {
+        /* Using four intermediate vectors (eq. 1.97) computed using the column vectors that span
+         * the top three rows, and the four values in the bottom row (eq. 1.96), we can compute the
+         * determinant of a 4D matrix without the need to find all 16 cofactors. Each of those
+         * cofactors is a 3×3 determinant, so this method greatly reduces overhead. Equations
+         * referenced from Foundations of Game Dev, vol. 1. */
+
+        // Get four column vectors, but only top 3 rows of them
+        const a = vec3(mat[0]);
+        const b = vec3(mat[1]);
+        const c = vec3(mat[2]);
+        const d = vec3(mat[3]);
+
+        // Get the bottom row
+        const x = mat[0][3];
+        const y = mat[1][3];
+        const z = mat[2][3];
+        const w = mat[3][3];
+
+        // Compute intermediate vectors
+        const s = cross(a, b);
+        const t = cross(c, b);
+        const u = sub(mul(y, a), mul(x, b));
+        const v = sub(mul(w, c), mul(z, d));
+
+        // Determinant
+        return dot(s, v) + dot(t, u);
+    } else {
+        // TS lacks the ability for union types to be mutually exclusive, so it doesn't know this
+        // branch is unreachable. https://github.com/microsoft/TypeScript/issues/27808
+        throw new Error("Unreachable: !isMatrix throws error, and all other branches return.");
+    }
+}
+
+/**
+ * Computes the inverse of a matrix.
+ *
+ * @note Since it doesn't really come up that often in computer graphics, this function doesn't
+ * bother to check if the matrix is invertible (i.e. if its determinant is zero). It would probably
+ * be undesired if such a commonly used function threw an error mid-runtime because of an edge-case
+ * like that.
+ */
+function inverse<T extends AnyMatrix>(mat: T): T {
+    if (!isMatrix(mat)) {
+        throw new Error("Invalid argument passed to 'inverse'. Expected a matrix.");
+    } else if (mat.type == 'mat2') {
+        const invDet = 1.0 / det(mat);
+        const invNeg = -invDet;
+        return mat2(
+            invDet * mat[1][1], invNeg * mat[0][1],
+            invNeg * mat[1][0], invDet * mat[0][0],
+        ) as T;
+    } else if (mat.type == 'mat3') {
+        /* The inverse of a 3D matrix is the cross product of its three column vectors, laid out
+         * row-by-row, multiplied by its determinant's reciprocal. See equations 1.94 and 1.95,
+         * listing 1.10 in Foundations of Game Dev, vol. 1. */
+        const a = vec3(mat[0]);
+        const b = vec3(mat[1]);
+        const c = vec3(mat[2]);
+
+        const r0 = cross(b, c);
+        const r1 = cross(c, a);
+        const r2 = cross(a, b);
+
+        const invDet = 1.0 / dot(r2, c);
+        return mat3(
+            r0[0] * invDet, r1[0] * invDet, r2[0] * invDet,
+            r0[1] * invDet, r1[1] * invDet, r2[1] * invDet,
+            r0[2] * invDet, r1[2] * invDet, r2[2] * invDet,
+        ) as T;
+    } else if (mat.type == 'mat4') {
+        /* We can make use of the same strategy employed by `det` above to efficiently compute the
+         * matrix's inverse. See that function and the equations it references, as well as equation
+         * 1.99 in Foundations of Game Dev, vol. 1. This implementation is modelled specifically
+         * after listing 1.11. */
+
+        // Get four column vectors, but only top 3 rows of them
+        const a = vec3(mat[0]);
+        const b = vec3(mat[1]);
+        const c = vec3(mat[2]);
+        const d = vec3(mat[3]);
+
+        // Get the bottom row
+        const x = mat[0][3];
+        const y = mat[1][3];
+        const z = mat[2][3];
+        const w = mat[3][3];
+
+        // Compute intermediate vectors
+        let s = cross(a, b);
+        let t = cross(c, b);
+        let u = sub(mul(y, a), mul(x, b));
+        let v = sub(mul(w, c), mul(z, d));
+        const invDet = 1.0 / (dot(s, t) + dot(t, u));
+
+        s = mul(s, invDet);
+        t = mul(t, invDet);
+        u = mul(u, invDet);
+        v = mul(v, invDet);
+
+        const r0 = mul(add(cross(b, v), t), y);
+        const r1 = mul(sub(cross(v, a), t), x);
+        const r2 = mul(add(cross(d, u), s), w);
+        const r3 = mul(sub(cross(u, c), s), z);
+
+        return mat4(
+            r0[0], r1[0], r2[0], r3[0],
+            r0[1], r1[1], r2[1], r3[1],
+            r0[2], r1[2], r2[2], r3[2],
+            -dot(b, t), dot(a, t), -dot(d, s), dot(c, s),
+        ) as T;
+    } else {
+        // TS lacks the ability for union types to be mutually exclusive, so it doesn't know this
+        // branch is unreachable. https://github.com/microsoft/TypeScript/issues/27808
+        throw new Error("Unreachable: !isMatrix throws error, and all other branches return.");
+    }
+}
+
+/**
+ * Computes the transpose of a matrix.
+ */
+function transpose<T extends AnyMatrix>(mat: T): T {
+    if (!isMatrix(mat)) {
+        throw new Error("Invalid argument passed to 'transpose'. Expected a matrix.");
+    } else if (mat.type == 'mat2') {
+        return mat2(
+            mat[0][0], mat[1][0],
+            mat[0][1], mat[1][1],
+        ) as T;
+    } else if (mat.type == 'mat3') {
+        return mat3(
+            mat[0][0], mat[1][0], mat[2][0],
+            mat[0][1], mat[1][1], mat[2][1],
+            mat[0][2], mat[1][2], mat[2][2],
+        ) as T;
+    } else if (mat.type == 'mat4') {
+        return mat4(
+            mat[0][0], mat[1][0], mat[2][0], mat[3][0],
+            mat[0][1], mat[1][1], mat[2][1], mat[3][1],
+            mat[0][2], mat[1][2], mat[2][2], mat[3][2],
+            mat[0][3], mat[1][3], mat[2][3], mat[3][3],
+        ) as T;
+    } else {
+        // TS lacks the ability for union types to be mutually exclusive, so it doesn't know this
+        // branch is unreachable. https://github.com/microsoft/TypeScript/issues/27808
+        throw new Error("Unreachable: !isMatrix throws error, and all other branches return.");
     }
 }
