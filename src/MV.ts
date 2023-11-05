@@ -160,7 +160,7 @@ function vec2(...args: (number | number[] | AnyVector)[]): Vec2 {
 
     if (args.length == 0) {
         // Leave as zeroes
-    } else if (args.length == 1 && values.length == 1) {
+    } else if (args.length == 1 && typeof args[0] === 'number') {
         out[0] = values[0];
         out[1] = values[0];
     } else if (values.length >= 2) {
@@ -227,7 +227,7 @@ function vec3(...args: (number | number[] | AnyVector)[]): Vec3 {
 
     if (args.length == 0) {
         // Leave as zeroes
-    } else if (args.length == 1 && values.length == 1) {
+    } else if (args.length == 1 && typeof args[0] === 'number') {
         out[0] = values[0];
         out[1] = values[0];
         out[2] = values[0];
@@ -301,7 +301,7 @@ function vec4(...args: (number | number[] | AnyVector)[]): Vec4 {
 
     if (values.length == 0) {
         // Leave as zeroes
-    } else if (args.length == 1 && values.length == 1) {
+    } else if (args.length == 1 && typeof args[0] === 'number') {
         out[0] = values[0];
         out[1] = values[0];
         out[2] = values[0];
@@ -653,6 +653,7 @@ function mat4(...args: (number | Mat4 | Vec4)[]): Mat4 {
 /** Checks if two 2×2 matrices are equal. */ function equal(a: Mat2, b: Mat2): boolean;
 /** Checks if two 3×3 matrices are equal. */ function equal(a: Mat3, b: Mat3): boolean;
 /** Checks if two 4×4 matrices are equal. */ function equal(a: Mat4, b: Mat4): boolean;
+/** @internal */ function equal<T extends AnyVector | AnyMatrix>(u: T, v: T): boolean;
 
 function equal<T extends AnyVector | AnyMatrix>(u: T, v: T): boolean {
     if (isVector(u) && isVector(v)) {
@@ -687,29 +688,18 @@ function equal<T extends AnyVector | AnyMatrix>(u: T, v: T): boolean {
 /** Adds one 2×2 matrix to another. */ function add(a: Mat2, b: Mat2): Mat2;
 /** Adds one 3×3 matrix to another. */ function add(a: Mat3, b: Mat3): Mat3;
 /** Adds one 4×4 matrix to another. */ function add(a: Mat4, b: Mat4): Mat4;
+/** @internal */ function add<T extends AnyVector | AnyMatrix>(u: T, v: T): T;
 
 function add<T extends AnyVector | AnyMatrix>(u: T, v: T): T {
     // Both must be vectors, or both must be matrices.
     if (!(isVector(u) && isVector(v) || isMatrix(u) && isMatrix(v))) {
-        throw new Error("Invalid arguments passed to 'add'. Expected two vectors or matrices.");
+        throw new Error("Invalid arguments passed to 'add'. Expected 2 vectors or 2 matrices.");
     } else if (u.type == 'vec2' && v.type == 'vec2') {
-        return vec2(
-            u[0] + v[0],
-            u[1] + v[1],
-        ) as T;
+        return vec2(u[0] + v[0], u[1] + v[1]) as T;
     } else if (u.type == 'vec3' && v.type == 'vec3') {
-        return vec3(
-            u[0] + v[0],
-            u[1] + v[1],
-            u[2] + v[2],
-        ) as T;
+        return vec3(u[0] + v[0], u[1] + v[1], u[2] + v[2]) as T;
     } else if (u.type == 'vec4' && v.type == 'vec4') {
-        return vec3(
-            u[0] + v[0],
-            u[1] + v[1],
-            u[2] + v[2],
-            u[3] + v[3],
-        ) as T;
+        return vec4(u[0] + v[0], u[1] + v[1], u[2] + v[2], u[3] + v[3]) as T;
     } else if (u.type == 'mat2' && v.type == 'mat2') {
         return mat2(
             u[0][0] + v[0][0], u[0][1] + v[0][1],
@@ -729,7 +719,7 @@ function add<T extends AnyVector | AnyMatrix>(u: T, v: T): T {
             u[3][0] + v[3][0], u[3][1] + v[3][1], u[3][2] + v[3][2], u[3][3] + v[3][3],
         ) as T;
     } else {
-        throw new Error("Attempted to add differently sized vectors/matrices.");
+        throw new Error("Invalid arguments passed to 'add'. Matrices/vectors must be the same size.");
     }
 }
 
@@ -741,28 +731,17 @@ function add<T extends AnyVector | AnyMatrix>(u: T, v: T): T {
 /** Subtracts one 2×2 matrix from another. */ function sub(a: Mat2, b: Mat2): Mat2;
 /** Subtracts one 3×3 matrix from another. */ function sub(a: Mat3, b: Mat3): Mat3;
 /** Subtracts one 4×4 matrix from another. */ function sub(a: Mat4, b: Mat4): Mat4;
+/** @internal */ function sub<T extends AnyVector | AnyMatrix>(u: T, v: T): T;
 
 function sub<T extends AnyVector | AnyMatrix>(u: T, v: T): T {
     if (!(isVector(u) && isVector(v) || isMatrix(u) && isMatrix(v))) {
-        throw new Error("Invalid arguments passed to 'sub'. Expected two vectors or matrices.");
+        throw new Error("Invalid arguments passed to 'sub'. Expected 2 vectors or 2 matrices.");
     } else if (u.type == 'vec2' && v.type == 'vec2') {
-        return vec2(
-            u[0] - v[0],
-            u[1] - v[1],
-        ) as T;
+        return vec2(u[0] - v[0], u[1] - v[1]) as T;
     } else if (u.type == 'vec3' && v.type == 'vec3') {
-        return vec3(
-            u[0] - v[0],
-            u[1] - v[1],
-            u[2] - v[2],
-        ) as T;
+        return vec3(u[0] - v[0], u[1] - v[1], u[2] - v[2]) as T;
     } else if (u.type == 'vec4' && v.type == 'vec4') {
-        return vec3(
-            u[0] - v[0],
-            u[1] - v[1],
-            u[2] - v[2],
-            u[3] - v[3],
-        ) as T;
+        return vec4(u[0] - v[0], u[1] - v[1], u[2] - v[2], u[3] - v[3]) as T;
     } else if (u.type == 'mat2' && v.type == 'mat2') {
         return mat2(
             u[0][0] - v[0][0], u[0][1] - v[0][1],
@@ -782,7 +761,7 @@ function sub<T extends AnyVector | AnyMatrix>(u: T, v: T): T {
             u[3][0] - v[3][0], u[3][1] - v[3][1], u[3][2] - v[3][2], u[3][3] - v[3][3],
         ) as T;
     } else {
-        throw new Error("Attempted to subtract differently sized vectors/matrices.");
+        throw new Error("Invalid arguments passed to 'sub'. Matrices/vectors must be the same size.");
     }
 }
 
@@ -791,7 +770,7 @@ function sub<T extends AnyVector | AnyMatrix>(u: T, v: T): T {
  * @deprecated This function has been renamed to {@link sub `sub`}.
  */
 function subtract<T extends AnyVector | AnyMatrix>(u: T, v: T): T {
-    return sub(u as any, v as any) as T;
+    return sub(u, v);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -806,6 +785,7 @@ function subtract<T extends AnyVector | AnyMatrix>(u: T, v: T): T {
 /** Multiplies two 2-dimensional vectors together, **component-wise.** */ function mul(u: Vec2, v: Vec2): Vec2;
 /** Multiplies two 3-dimensional vectors together, **component-wise.** */ function mul(u: Vec3, v: Vec3): Vec3;
 /** Multiplies two 4-dimensional vectors together, **component-wise.** */ function mul(u: Vec4, v: Vec4): Vec4;
+/** @internal */ function mul<T extends AnyVector | AnyMatrix>(u: T | number, v: T | number): T;
 
 function mul<T extends AnyVector | AnyMatrix>(u: T | number, v: T | number): T {
     if (
@@ -844,8 +824,8 @@ function mul<T extends AnyVector | AnyMatrix>(u: T | number, v: T | number): T {
         }
     } else if (!(isVector(u) && isVector(v) || isMatrix(u) && isMatrix(v))) {
         throw new Error(
-            "Invalid arguments passed to 'mul'. Expected either two matrices, two vectors, " +
-            "one matrix plus a scalar, or one vector plus a scalar."
+            "Invalid arguments passed to 'mul'. Expected either 2 matrices, 2 vectors, " +
+            "1 matrix plus 1 scalar, or 1 vector plus 1 scalar."
         );
     } else if (u.type == 'mat2' && v.type == 'mat2') {
         return mat2(
@@ -913,7 +893,7 @@ function mul<T extends AnyVector | AnyMatrix>(u: T | number, v: T | number): T {
             u[3] * v[3],
         ) as T;
     } else {
-        throw new Error("Invalid arguments passed to 'mul'. Attempted to multiply differently sized vectors/matrices.");
+        throw new Error("Invalid arguments passed to 'mul'. Matrices/vectors must be the same size.");
     }
 }
 
@@ -921,8 +901,101 @@ function mul<T extends AnyVector | AnyMatrix>(u: T | number, v: T | number): T {
  * Multiplies one vector or matrix with a scalar or another vector or matrix.
   @deprecated This function has been renamed to {@link mul `mul`}.
  */
-function mult<T extends AnyVector | AnyMatrix>(u: T | number, v: T | number): T {
-    return mul(u as any, v as any) as T;
+function mult<T extends AnyVector | AnyMatrix>(u: T, v: T): T {
+    return mul(u, v);
 }
 
-// -------------------------------------------------------------------------------------------------
+// =================================================================================================
+// Vector functions
+// =================================================================================================
+
+/** Computes the dot product between two 2-dimensional vectors. */ function dot(u: Vec2, v: Vec2): number;
+/** Computes the dot product between two 3-dimensional vectors. */ function dot(u: Vec3, v: Vec3): number;
+/** Computes the dot product between two 4-dimensional vectors. */ function dot(u: Vec4, v: Vec4): number;
+/** @internal */ function dot<T extends AnyVector>(u: T, v: T): number;
+
+function dot<T extends AnyVector>(u: T, v: T): number {
+    if (!isVector(u) || !isVector(v)) {
+        throw new Error("Invalid arguments passed to 'dot'. Expected two vectors.");
+    } else if (u.type == 'vec2' && v.type == 'vec2') {
+        return u[0] * v[0] + u[1] * v[1];
+    } else if (u.type == 'vec3' && v.type == 'vec3') {
+        return u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
+    } else if (u.type == 'vec4' && v.type == 'vec4') {
+        return u[0] * v[0] + u[1] * v[1] + u[2] * v[2] + u[3] * v[3];
+    } else {
+        throw new Error("Invalid arguments passed to 'dot'. Vectors must be the same size");
+    }
+}
+
+/**
+ * Computes the cross product between two 3-dimensional vectors.
+ */
+function cross(u: Vec3, v: Vec3): Vec3 {
+    if (!isVector(u) || !isVector(v)) {
+        throw new Error("Invalid arguments passed to 'cross'. Expected two vectors.");
+    } else if (u.type != 'vec3' || v.type != 'vec3') {
+        throw new Error("Invalid arguments passed to 'cross'. Vectors must be 3-dimensional.");
+    } else {
+        return vec3(
+            u[1] * v[2] - u[2] * v[1],
+            u[2] * v[0] - u[0] * v[2],
+            u[0] * v[1] - u[1] * v[0],
+        );
+    }
+}
+
+/**
+ * Computes the magnitude of a vector.
+ */
+function magnitude(v: AnyVector): number {
+    if (!isVector(v)) {
+        throw new Error("Invalid argument passed to 'magnitude'. Expected a vector.");
+    } else {
+        return Math.sqrt(dot(v, v));
+    }
+}
+
+/**
+ * Computes a normalized version of the given vector.
+ */
+function normalize<T extends AnyVector>(v: T): T {
+    if (!isVector(v)) {
+        throw new Error("Invalid argument passed to 'normalize'. Expected a vector.");
+    } else {
+        return mul(v, 1 / magnitude(v));
+    }
+}
+
+
+/**
+ * Mixes two vectors or two numbers together with ratio `s`.
+ *
+ * `u` is multiplied by `1 - s` before being added to `s * v`.
+ * @param u The first vector or number.
+ * @param v The second vector or number.
+ * @param s A number from 0 to 1; the ratio of `u` to `v`.
+ */
+function mix<T extends AnyVector | number>(u: T, v: T, s: number): T {
+    if (typeof s !== 'number') {
+        throw new Error("Invalid argument passed to 'mix'. Expected 's' to be a vector.");
+    }
+
+    // Clamp to [0, 1]
+    s = Math.min(1.0, Math.max(s, 0.0));
+    const r = 1 - s;
+
+    if (typeof u === 'number' && typeof v === 'number') {
+        return (r * u + s * v) as T;
+    } else if (!isVector(u) || !isVector(v)) {
+        throw new Error("Invalid arguments passed to 'mix'. Expected 'u' and 'v' to be vectors or numbers.");
+    } else if (u.type == 'vec2' && v.type == 'vec2') {
+        return vec2(r * u[0] + s * v[0], r * u[1] + s * v[1]) as T;
+    } else if (u.type == 'vec3' && v.type == 'vec3') {
+        return vec3(r * u[0] + s * v[0], r * u[1] + s * v[1], r * u[2] + s * v[2]) as T;
+    } else if (u.type == 'vec4' && v.type == 'vec4') {
+        return vec4(r * u[0] + s * v[0], r * u[1] + s * v[1], r * u[2] + s * v[2], r * u[3] + s * v[3]) as T;
+    } else {
+        throw new Error("Unreachable: !isVector throws error, and all vector variants return.");
+    }
+}

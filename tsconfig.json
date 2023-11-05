@@ -11,8 +11,9 @@
         "rootDir": "./src",
         "outDir": "./lib",
         "strict": true,
-        "declaration": true,
         "noImplicitReturns": true,
+        "declaration": true,
+        "stripInternal": true,
     },
     "include": [
         "./src/**/*.ts",
