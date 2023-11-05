@@ -330,10 +330,10 @@ function vec4(...args: (number | number[] | AnyVector)[]): Vec4 {
  *
  * Parameters are given in **column-major order.**
  *
- * @param {number} m00 The value for row 0, column 0.
- * @param {number} m10 The value for row 1, column 0.
- * @param {number} m01 The value for row 0, column 1.
- * @param {number} m11 The value for row 1, column 1.
+ * @param {number} m00 The value for row 1, column 1.
+ * @param {number} m10 The value for row 2, column 1.
+ * @param {number} m01 The value for row 1, column 2.
+ * @param {number} m11 The value for row 2, column 2.
  */
 function mat2(
     m00: number, m10: number,
@@ -421,15 +421,15 @@ function mat2(...args: (number | Mat2 | Vec2)[]): Mat2 {
  *
  * Parameters are given in **column-major order.**
  *
- * @param m00 The value for row 0, column 0.
- * @param m10 The value for row 1, column 0.
- * @param m20 The value for row 2, column 0.
- * @param m01 The value for row 0, column 1.
- * @param m11 The value for row 1, column 1.
- * @param m21 The value for row 2, column 1.
- * @param m02 The value for row 0, column 2.
- * @param m12 The value for row 1, column 2.
- * @param m22 The value for row 2, column 2.
+ * @param m00 The value for row 1, column 1.
+ * @param m10 The value for row 2, column 1.
+ * @param m20 The value for row 3, column 1.
+ * @param m01 The value for row 1, column 2.
+ * @param m11 The value for row 2, column 2.
+ * @param m21 The value for row 3, column 2.
+ * @param m02 The value for row 1, column 3.
+ * @param m12 The value for row 2, column 3.
+ * @param m22 The value for row 3, column 3.
  */
 function mat3(
     m00: number, m10: number, m20: number,
@@ -529,22 +529,22 @@ function mat3(...args: (number | Mat3 | Vec3)[]): Mat3 {
  *
  * Entries are given in **column-major order.**
  *
- * @param m00 The value for row 0, column 0.
- * @param m10 The value for row 1, column 0.
- * @param m20 The value for row 2, column 0.
- * @param m30 The value for row 3, column 0.
- * @param m01 The value for row 0, column 1.
- * @param m11 The value for row 1, column 1.
- * @param m21 The value for row 2, column 1.
- * @param m31 The value for row 3, column 1.
- * @param m02 The value for row 0, column 2.
- * @param m12 The value for row 1, column 2.
- * @param m22 The value for row 2, column 2.
- * @param m32 The value for row 3, column 2.
- * @param m03 The value for row 0, column 3.
- * @param m13 The value for row 1, column 3.
- * @param m23 The value for row 2, column 3.
- * @param m33 The value for row 3, column 3.
+ * @param m00 The value for row 1, column 1.
+ * @param m10 The value for row 2, column 1.
+ * @param m20 The value for row 3, column 1.
+ * @param m30 The value for row 4, column 1.
+ * @param m01 The value for row 1, column 2.
+ * @param m11 The value for row 2, column 2.
+ * @param m21 The value for row 3, column 2.
+ * @param m31 The value for row 4, column 2.
+ * @param m02 The value for row 1, column 3.
+ * @param m12 The value for row 2, column 3.
+ * @param m22 The value for row 3, column 3.
+ * @param m32 The value for row 4, column 3.
+ * @param m03 The value for row 1, column 4.
+ * @param m13 The value for row 2, column 4.
+ * @param m23 The value for row 3, column 4.
+ * @param m33 The value for row 4, column 4.
  */
 function mat4(
     m00: number, m10: number, m20: number, m30: number,
@@ -642,3 +642,287 @@ function mat4(...args: (number | Mat4 | Vec4)[]): Mat4 {
 
     return out;
 }
+
+// =================================================================================================
+// Operations
+// =================================================================================================
+
+/** Checks if two 2-dimensional vectors are equal. */ function equal(u: Vec2, v: Vec2): boolean;
+/** Checks if two 3-dimensional vectors are equal. */ function equal(u: Vec3, v: Vec3): boolean;
+/** Checks if two 4-dimensional vectors are equal. */ function equal(u: Vec4, v: Vec4): boolean;
+/** Checks if two 2×2 matrices are equal. */ function equal(a: Mat2, b: Mat2): boolean;
+/** Checks if two 3×3 matrices are equal. */ function equal(a: Mat3, b: Mat3): boolean;
+/** Checks if two 4×4 matrices are equal. */ function equal(a: Mat4, b: Mat4): boolean;
+
+function equal<T extends AnyVector | AnyMatrix>(u: T, v: T): boolean {
+    if (isVector(u) && isVector(v)) {
+        if (u.length != v.length)
+            return false;
+
+        for (let i = 0; i < u.length; i++)
+            if (u[i] !== v[i])
+                return false;
+
+        return true;
+    } else if (isMatrix(u) && isMatrix(v)) {
+        if (u.length != v.length)
+            return false;
+
+        for (let i = 0; i < u.length; i++)
+            for (let j = 0; j < u.length; j++)
+                if (u[i][j] !== v[i][j])
+                    return false;
+
+        return true;
+    } else {
+        throw new Error("Invalid arguments passed to 'equal'. Expected 2 vectors or 2 matrices.");
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/** Adds one 2-dimensional vector to another. */ function add(u: Vec2, v: Vec2): Vec2;
+/** Adds one 3-dimensional vector to another. */ function add(u: Vec3, v: Vec3): Vec3;
+/** Adds one 4-dimensional vector to another. */ function add(u: Vec4, v: Vec4): Vec4;
+/** Adds one 2×2 matrix to another. */ function add(a: Mat2, b: Mat2): Mat2;
+/** Adds one 3×3 matrix to another. */ function add(a: Mat3, b: Mat3): Mat3;
+/** Adds one 4×4 matrix to another. */ function add(a: Mat4, b: Mat4): Mat4;
+
+function add<T extends AnyVector | AnyMatrix>(u: T, v: T): T {
+    // Both must be vectors, or both must be matrices.
+    if (!(isVector(u) && isVector(v) || isMatrix(u) && isMatrix(v))) {
+        throw new Error("Invalid arguments passed to 'add'. Expected two vectors or matrices.");
+    } else if (u.type == 'vec2' && v.type == 'vec2') {
+        return vec2(
+            u[0] + v[0],
+            u[1] + v[1],
+        ) as T;
+    } else if (u.type == 'vec3' && v.type == 'vec3') {
+        return vec3(
+            u[0] + v[0],
+            u[1] + v[1],
+            u[2] + v[2],
+        ) as T;
+    } else if (u.type == 'vec4' && v.type == 'vec4') {
+        return vec3(
+            u[0] + v[0],
+            u[1] + v[1],
+            u[2] + v[2],
+            u[3] + v[3],
+        ) as T;
+    } else if (u.type == 'mat2' && v.type == 'mat2') {
+        return mat2(
+            u[0][0] + v[0][0], u[0][1] + v[0][1],
+            u[1][0] + v[1][0], u[1][1] + v[1][1],
+        ) as T;
+    } else if (u.type == 'mat3' && v.type == 'mat3') {
+        return mat3(
+            u[0][0] + v[0][0], u[0][1] + v[0][1], u[0][2] + v[0][2],
+            u[1][0] + v[1][0], u[1][1] + v[1][1], u[1][2] + v[1][2],
+            u[2][0] + v[2][0], u[2][1] + v[2][1], u[2][2] + v[2][2],
+        ) as T;
+    } else if (u.type == 'mat4' && v.type == 'mat4') {
+        return mat4(
+            u[0][0] + v[0][0], u[0][1] + v[0][1], u[0][2] + v[0][2], u[0][3] + v[0][3],
+            u[1][0] + v[1][0], u[1][1] + v[1][1], u[1][2] + v[1][2], u[1][3] + v[1][3],
+            u[2][0] + v[2][0], u[2][1] + v[2][1], u[2][2] + v[2][2], u[2][3] + v[2][3],
+            u[3][0] + v[3][0], u[3][1] + v[3][1], u[3][2] + v[3][2], u[3][3] + v[3][3],
+        ) as T;
+    } else {
+        throw new Error("Attempted to add differently sized vectors/matrices.");
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/** Subtracts one 2-dimensional vector from another. */ function sub(u: Vec2, v: Vec2): Vec2;
+/** Subtracts one 3-dimensional vector from another. */ function sub(u: Vec3, v: Vec3): Vec3;
+/** Subtracts one 4-dimensional vector from another. */ function sub(u: Vec4, v: Vec4): Vec4;
+/** Subtracts one 2×2 matrix from another. */ function sub(a: Mat2, b: Mat2): Mat2;
+/** Subtracts one 3×3 matrix from another. */ function sub(a: Mat3, b: Mat3): Mat3;
+/** Subtracts one 4×4 matrix from another. */ function sub(a: Mat4, b: Mat4): Mat4;
+
+function sub<T extends AnyVector | AnyMatrix>(u: T, v: T): T {
+    if (!(isVector(u) && isVector(v) || isMatrix(u) && isMatrix(v))) {
+        throw new Error("Invalid arguments passed to 'sub'. Expected two vectors or matrices.");
+    } else if (u.type == 'vec2' && v.type == 'vec2') {
+        return vec2(
+            u[0] - v[0],
+            u[1] - v[1],
+        ) as T;
+    } else if (u.type == 'vec3' && v.type == 'vec3') {
+        return vec3(
+            u[0] - v[0],
+            u[1] - v[1],
+            u[2] - v[2],
+        ) as T;
+    } else if (u.type == 'vec4' && v.type == 'vec4') {
+        return vec3(
+            u[0] - v[0],
+            u[1] - v[1],
+            u[2] - v[2],
+            u[3] - v[3],
+        ) as T;
+    } else if (u.type == 'mat2' && v.type == 'mat2') {
+        return mat2(
+            u[0][0] - v[0][0], u[0][1] - v[0][1],
+            u[1][0] - v[1][0], u[1][1] - v[1][1],
+        ) as T;
+    } else if (u.type == 'mat3' && v.type == 'mat3') {
+        return mat3(
+            u[0][0] - v[0][0], u[0][1] - v[0][1], u[0][2] - v[0][2],
+            u[1][0] - v[1][0], u[1][1] - v[1][1], u[1][2] - v[1][2],
+            u[2][0] - v[2][0], u[2][1] - v[2][1], u[2][2] - v[2][2],
+        ) as T;
+    } else if (u.type == 'mat4' && v.type == 'mat4') {
+        return mat4(
+            u[0][0] - v[0][0], u[0][1] - v[0][1], u[0][2] - v[0][2], u[0][3] - v[0][3],
+            u[1][0] - v[1][0], u[1][1] - v[1][1], u[1][2] - v[1][2], u[1][3] - v[1][3],
+            u[2][0] - v[2][0], u[2][1] - v[2][1], u[2][2] - v[2][2], u[2][3] - v[2][3],
+            u[3][0] - v[3][0], u[3][1] - v[3][1], u[3][2] - v[3][2], u[3][3] - v[3][3],
+        ) as T;
+    } else {
+        throw new Error("Attempted to subtract differently sized vectors/matrices.");
+    }
+}
+
+/**
+ * Subtracts one matrix or vector from another.
+ * @deprecated This function has been renamed to {@link sub `sub`}.
+ */
+function subtract<T extends AnyVector | AnyMatrix>(u: T, v: T): T {
+    return sub(u as any, v as any) as T;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/** Multiplies two 2×2 matrices together. */ function mul(a: Mat2, b: Mat2): Mat2;
+/** Multiplies two 3×3 matrices together. */ function mul(a: Mat3, b: Mat3): Mat3;
+/** Multiplies two 4×4 matrices together. */ function mul(a: Mat4, b: Mat4): Mat4;
+/** Multiplies a matrix with a scalar. */ function mul<T extends AnyMatrix>(mat: T, scalar: number): T;
+/** Multiplies a vector with a scalar. */ function mul<T extends AnyVector>(vec: T, scalar: number): T;
+/** Multiplies a matrix with a scalar. */ function mul<T extends AnyMatrix>(scalar: number, mat: T): T;
+/** Multiplies a vector with a scalar. */ function mul<T extends AnyVector>(scalar: number, vec: T): T;
+/** Multiplies two 2-dimensional vectors together, **component-wise.** */ function mul(u: Vec2, v: Vec2): Vec2;
+/** Multiplies two 3-dimensional vectors together, **component-wise.** */ function mul(u: Vec3, v: Vec3): Vec3;
+/** Multiplies two 4-dimensional vectors together, **component-wise.** */ function mul(u: Vec4, v: Vec4): Vec4;
+
+function mul<T extends AnyVector | AnyMatrix>(u: T | number, v: T | number): T {
+    if (
+        typeof u === 'number' && (isMatrix(v) || isVector(v)) ||
+        typeof v === 'number' && (isMatrix(u) || isVector(u))
+    ) {
+        let m: AnyMatrix | AnyVector;
+        let n: number;
+        if (typeof u === 'number') {
+            m = v as AnyMatrix | AnyVector;
+            n = u;
+        } else {
+            m = u;
+            n = v as number;
+        }
+
+        switch (m.type) {
+            case 'vec2': return vec2(m[0] * n, m[1] * n) as T;
+            case 'vec3': return vec3(m[0] * n, m[1] * n, m[2] * n) as T;
+            case 'vec4': return vec4(m[0] * n, m[1] * n, m[2] * n, m[4] * n) as T;
+            case 'mat2': return mat2(
+                m[0][0] * n, m[0][1] * n,
+                m[1][0] * n, m[1][1] * n,
+            ) as T;
+            case 'mat3': return mat3(
+                m[0][0] * n, m[0][1] * n, m[0][2] * n,
+                m[1][0] * n, m[1][1] * n, m[1][2] * n,
+                m[2][0] * n, m[2][1] * n, m[2][2] * n,
+            ) as T;
+            case 'mat4': return mat4(
+                m[0][0] * n, m[0][1] * n, m[0][2] * n, m[0][3] * n,
+                m[1][0] * n, m[1][1] * n, m[1][2] * n, m[1][3] * n,
+                m[2][0] * n, m[2][1] * n, m[2][2] * n, m[2][3] * n,
+                m[3][0] * n, m[3][1] * n, m[3][2] * n, m[3][3] * n,
+            ) as T;
+        }
+    } else if (!(isVector(u) && isVector(v) || isMatrix(u) && isMatrix(v))) {
+        throw new Error(
+            "Invalid arguments passed to 'mul'. Expected either two matrices, two vectors, " +
+            "one matrix plus a scalar, or one vector plus a scalar."
+        );
+    } else if (u.type == 'mat2' && v.type == 'mat2') {
+        return mat2(
+            /* col 0 --------------------------------------------- */
+                /* row 0 */(u[0][0] * v[0][0]) + (u[1][0] * v[0][1]),
+                /* row 1 */(u[0][0] * v[1][0]) + (u[1][0] * v[1][1]),
+            /* col 1 --------------------------------------------- */
+                /* row 0 */(u[0][1] * v[0][0]) + (u[1][1] * v[0][1]),
+                /* row 1 */(u[0][1] * v[1][0]) + (u[1][1] * v[1][1]),
+        ) as T;
+    } else if (u.type == 'mat3' && v.type == 'mat3') {
+        return mat3(
+            /* col 0 ------------------------------------------------------------------- */
+                /* row 0 */(u[0][0] * v[0][0]) + (u[1][0] * v[0][1]) + (u[2][0] * v[0][2]),
+                /* row 1 */(u[0][0] * v[1][0]) + (u[1][0] * v[1][1]) + (u[2][0] * v[1][2]),
+                /* row 2 */(u[0][0] * v[2][0]) + (u[1][0] * v[2][1]) + (u[2][0] * v[2][2]),
+            /* col 1 ------------------------------------------------------------------- */
+                /* row 0 */(u[0][1] * v[0][0]) + (u[1][1] * v[0][1]) + (u[2][1] * v[0][2]),
+                /* row 1 */(u[0][1] * v[1][0]) + (u[1][1] * v[1][1]) + (u[2][1] * v[1][2]),
+                /* row 2 */(u[0][1] * v[2][0]) + (u[1][1] * v[2][1]) + (u[2][1] * v[2][2]),
+            /* col 2 ------------------------------------------------------------------- */
+                /* row 0 */(u[0][2] * v[0][0]) + (u[1][2] * v[0][1]) + (u[2][2] * v[0][2]),
+                /* row 1 */(u[0][2] * v[1][0]) + (u[1][2] * v[1][1]) + (u[2][2] * v[1][2]),
+                /* row 2 */(u[0][2] * v[2][0]) + (u[1][2] * v[2][1]) + (u[2][2] * v[2][2]),
+        ) as T;
+    } else if (u.type == 'mat4' && v.type == 'mat4') {
+        return mat4(
+            /* col 0 ----------------------------------------------------------------------------------------- */
+                /* row 0 */(u[0][0] * v[0][0]) + (u[1][0] * v[0][1]) + (u[2][0] * v[0][2]) + (u[3][0] * v[0][3]),
+                /* row 1 */(u[0][0] * v[1][0]) + (u[1][0] * v[1][1]) + (u[2][0] * v[1][2]) + (u[3][0] * v[1][3]),
+                /* row 2 */(u[0][0] * v[2][0]) + (u[1][0] * v[2][1]) + (u[2][0] * v[2][2]) + (u[3][0] * v[2][3]),
+                /* row 3 */(u[0][0] * v[3][0]) + (u[1][0] * v[3][1]) + (u[2][0] * v[3][2]) + (u[3][0] * v[3][3]),
+            /* col 1 ----------------------------------------------------------------------------------------- */
+                /* row 0 */(u[0][1] * v[0][0]) + (u[1][1] * v[0][1]) + (u[2][1] * v[0][2]) + (u[3][1] * v[0][3]),
+                /* row 1 */(u[0][1] * v[1][0]) + (u[1][1] * v[1][1]) + (u[2][1] * v[1][2]) + (u[3][1] * v[1][3]),
+                /* row 2 */(u[0][1] * v[2][0]) + (u[1][1] * v[2][1]) + (u[2][1] * v[2][2]) + (u[3][1] * v[2][3]),
+                /* row 3 */(u[0][1] * v[3][0]) + (u[1][1] * v[3][1]) + (u[2][1] * v[3][2]) + (u[3][1] * v[3][3]),
+            /* col 2 ----------------------------------------------------------------------------------------- */
+                /* row 0 */(u[0][2] * v[0][0]) + (u[1][2] * v[0][1]) + (u[2][2] * v[0][2]) + (u[3][2] * v[0][3]),
+                /* row 1 */(u[0][2] * v[1][0]) + (u[1][2] * v[1][1]) + (u[2][2] * v[1][2]) + (u[3][2] * v[1][3]),
+                /* row 2 */(u[0][2] * v[2][0]) + (u[1][2] * v[2][1]) + (u[2][2] * v[2][2]) + (u[3][2] * v[2][3]),
+                /* row 3 */(u[0][2] * v[3][0]) + (u[1][2] * v[3][1]) + (u[2][2] * v[3][2]) + (u[3][2] * v[3][3]),
+            /* col 3 ----------------------------------------------------------------------------------------- */
+                /* row 0 */(u[0][3] * v[0][0]) + (u[1][3] * v[0][1]) + (u[2][3] * v[0][2]) + (u[3][3] * v[0][3]),
+                /* row 1 */(u[0][3] * v[1][0]) + (u[1][3] * v[1][1]) + (u[2][3] * v[1][2]) + (u[3][3] * v[1][3]),
+                /* row 2 */(u[0][3] * v[2][0]) + (u[1][3] * v[2][1]) + (u[2][3] * v[2][2]) + (u[3][3] * v[2][3]),
+                /* row 3 */(u[0][3] * v[3][0]) + (u[1][3] * v[3][1]) + (u[2][3] * v[3][2]) + (u[3][3] * v[3][3]),
+        ) as T;
+    } else if (u.type == 'vec2' && v.type == 'vec2') {
+        return vec2(
+            u[0] * v[0],
+            u[1] * v[1],
+        ) as T;
+    } else if (u.type == 'vec3' && v.type == 'vec3') {
+        return vec3(
+            u[0] * v[0],
+            u[1] * v[1],
+            u[2] * v[2],
+        ) as T;
+    } else if (u.type == 'vec4' && v.type == 'vec4') {
+        return vec3(
+            u[0] * v[0],
+            u[1] * v[1],
+            u[2] * v[2],
+            u[3] * v[3],
+        ) as T;
+    } else {
+        throw new Error("Invalid arguments passed to 'mul'. Attempted to multiply differently sized vectors/matrices.");
+    }
+}
+
+/**
+ * Multiplies one vector or matrix with a scalar or another vector or matrix.
+  @deprecated This function has been renamed to {@link mul `mul`}.
+ */
+function mult<T extends AnyVector | AnyMatrix>(u: T | number, v: T | number): T {
+    return mul(u as any, v as any) as T;
+}
+
+// -------------------------------------------------------------------------------------------------
