@@ -1,4 +1,4 @@
-// cspell:words Bézier mult
+// cspell:words Bézier
 
 type Vec2 = { type: 'vec2' } & [number, number];
 type Vec3 = { type: 'vec3' } & [number, number, number];
@@ -829,7 +829,7 @@ function subtract<T extends AnyVector | AnyMatrix>(u: T, v: T): T {
  * @throws An error will occur when attempting to multiply two non-matrix or non-vector types (aside
  * from a matrix or vector with a number), or two matrix/vector types of different size.
  */
-function mul<T extends AnyMatrix>(a: T, b: T): T;
+function mult<T extends AnyMatrix>(a: T, b: T): T;
 
 /**
  * Computes the scalar multiple of a vector or matrix.
@@ -838,7 +838,7 @@ function mul<T extends AnyMatrix>(a: T, b: T): T;
  * @throws An error will occur when attempting to multiply two non-matrix or non-vector types (aside
  * from a matrix or vector with a number), or two matrix/vector types of different size.
  */
-function mul<T extends AnyVector | AnyMatrix>(u: T, scalar: number): T;
+function mult<T extends AnyVector | AnyMatrix>(u: T, scalar: number): T;
 
 /**
  * Computes the scalar multiple of a vector or matrix.
@@ -847,7 +847,7 @@ function mul<T extends AnyVector | AnyMatrix>(u: T, scalar: number): T;
  * @throws An error will occur when attempting to multiply two non-matrix or non-vector types (aside
  * from a matrix or vector with a number), or two matrix/vector types of different size.
  */
-function mul<T extends AnyVector | AnyMatrix>(scalar: number, u: T): T;
+function mult<T extends AnyVector | AnyMatrix>(scalar: number, u: T): T;
 
 /**
  * Computes the matrix product between a matrix and vector.
@@ -856,7 +856,7 @@ function mul<T extends AnyVector | AnyMatrix>(scalar: number, u: T): T;
  * @throws An error will occur when attempting to multiply two non-matrix or non-vector types (aside
  * from a matrix or vector with a number), or two matrix/vector types of different size.
  */
-function mul<M extends AnyMatrix, V extends VectorWithSizeof<M>>(m: M, v: V): V;
+function mult<M extends AnyMatrix, V extends VectorWithSizeof<M>>(m: M, v: V): V;
 
 /**
  * Computes the element-wise product of two vectors, also known as the
@@ -871,9 +871,9 @@ function mul<M extends AnyMatrix, V extends VectorWithSizeof<M>>(m: M, v: V): V;
  * @throws An error will occur when attempting to multiply two non-matrix or non-vector types (aside
  * from a matrix or vector with a number), or two matrix/vector types of different size.
  */
-function mul<T extends AnyVector>(u: T, v: T): T;
+function mult<T extends AnyVector>(u: T, v: T): T;
 
-function mul(u: AnyVector | AnyMatrix | number, v: AnyVector | AnyMatrix | number): AnyVector | AnyMatrix {
+function mult(u: AnyVector | AnyMatrix | number, v: AnyVector | AnyMatrix | number): AnyVector | AnyMatrix {
     if (isMatrix(u) && isMatrix(v)) {
         if (u.type === 'mat4' && v.type === 'mat4') {
             return mat4(
@@ -1019,23 +1019,9 @@ function mul(u: AnyVector | AnyMatrix | number, v: AnyVector | AnyMatrix | numbe
         );
 }
 
-/**
- * Multiplies one vector or matrix with another vector or matrix, or with a scalar.
- *
- * @deprecated This function has been renamed to {@link mul `mul`}. Use that function for better
- * type inference.
- */
-function mult(
-    u: AnyVector | AnyMatrix | number,
-    v: AnyVector | AnyMatrix | number,
-): AnyVector | AnyMatrix {
-    return mul(u as any, v as any);
-}
-
 // =================================================================================================
 // Vector functions
 // =================================================================================================
-
 
 /**
  * Computes the dot product of two vectors.
@@ -1111,7 +1097,7 @@ function magnitude(v: AnyVector): number {
  */
 function normalize<T extends AnyVector>(v: T): T {
     if (isVector(v))
-        return mul(v, 1 / magnitude(v));
+        return mult(v, 1 / magnitude(v));
 
     const vType: string = (v as any)?.type ?? typeof v;
     throw new Error(`Invalid argument passed to 'normalize':\n Expected a vector, received ${vType}.`);
@@ -1189,8 +1175,8 @@ function det(m: AnyMatrix): number {
             // Compute intermediate vectors
             const s = cross(a, b);
             const t = cross(c, b);
-            const u = sub(mul(y, a), mul(x, b));
-            const v = sub(mul(w, c), mul(z, d));
+            const u = sub(mult(y, a), mult(x, b));
+            const v = sub(mult(w, c), mult(z, d));
 
             // Determinant
             return dot(s, v) + dot(t, u);
@@ -1246,19 +1232,19 @@ function inverse<T extends AnyMatrix>(m: T): T {
             // Compute intermediate vectors
             let s = cross(a, b);
             let t = cross(c, b);
-            let u = sub(mul(y, a), mul(x, b));
-            let v = sub(mul(w, c), mul(z, d));
+            let u = sub(mult(y, a), mult(x, b));
+            let v = sub(mult(w, c), mult(z, d));
             const invDet = 1.0 / (dot(s, t) + dot(t, u));
 
-            s = mul(s, invDet);
-            t = mul(t, invDet);
-            u = mul(u, invDet);
-            v = mul(v, invDet);
+            s = mult(s, invDet);
+            t = mult(t, invDet);
+            u = mult(u, invDet);
+            v = mult(v, invDet);
 
-            const r0 = mul(add(cross(b, v), t), y);
-            const r1 = mul(sub(cross(v, a), t), x);
-            const r2 = mul(add(cross(d, u), s), w);
-            const r3 = mul(sub(cross(u, c), s), z);
+            const r0 = mult(add(cross(b, v), t), y);
+            const r1 = mult(sub(cross(v, a), t), x);
+            const r2 = mult(add(cross(d, u), s), w);
+            const r3 = mult(sub(cross(u, c), s), z);
 
             return mat4(
                 r0[0], r1[0], r2[0], r3[0],
