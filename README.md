@@ -22,7 +22,6 @@ with JSDoc annotations to make it as frictionless as possible.
 
 ...but first, I need to get caught up marking the assignments 😅
 
----
 
 [book-repo]: https://github.com/jiayaozhang/Interactive-Computer-Graphics-WebGL
 
