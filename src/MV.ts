@@ -8,8 +8,8 @@ type Mat2 = { type: 'mat2' } & [[number, number], [number, number]];
 type Mat3 = { type: 'mat3' } & [[number, number, number], [number, number, number], [number, number, number]];
 type Mat4 = { type: 'mat4' } & [[number, number, number, number], [number, number, number, number], [number, number, number, number], [number, number, number, number]];
 
-type Curve = [number, number, number, number];
-type Patch = [[number, number, number, number], [number, number, number, number], [number, number, number, number], [number, number, number, number]];
+type Curve = { type: 'curve' } & [number, number, number, number];
+type Patch = { type: 'patch' } & [[number, number, number, number], [number, number, number, number], [number, number, number, number], [number, number, number, number]];
 
 type AnyVector = Vec2 | Vec3 | Vec4;
 type AnyMatrix = Mat2 | Mat3 | Mat4;
