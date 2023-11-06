@@ -1,6 +1,3 @@
 .vscode/
-
 node_modules/
-
-# Compiled output folder
-lib/
+dist/

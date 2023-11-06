@@ -1,8 +1,15 @@
 /**
- * One of the possible shader types that WebGL2 supports. Must be one of either `gl.VERTEX_SHADER`
- * or `gl.FRAGMENT_SHADER`.
+ * Strips an info log and wraps it with \```backticks\```. A tiny bit of extra processing is needed
+ * to get it to print nice since WebGL returns a string with a NUL byte it in.
+ * @param infoLog The info log, directly as returned by WebGL.
  */
-type ShaderType = WebGL2RenderingContext['FRAGMENT_SHADER'] | WebGL2RenderingContext['VERTEX_SHADER'];
+function formatInfoLog(infoLog: string | null): string {
+    if (infoLog === null) {
+        return '[INFO LOG MISSING?]';
+    } else {
+        return '```\n' + infoLog.replace(/\u0000/g, '').trim() + '\n```';
+    }
+}
 
 
 /**
@@ -12,7 +19,7 @@ type ShaderType = WebGL2RenderingContext['FRAGMENT_SHADER'] | WebGL2RenderingCon
  * @param fragShaderFilepath The path to your fragment shader file.
  * @returns A compiled program.
  */
-async function initShaders(
+export async function initShaders(
     gl: WebGL2RenderingContext,
     vertShaderFilepath: string,
     fragShaderFilepath: string,
@@ -53,7 +60,6 @@ async function initShaders(
 }
 
 
-
 /**
  * Creates a single shader object of the given type by loading the given file with an AJAX request.
  *
@@ -61,13 +67,14 @@ async function initShaders(
  * to call this function from your own code. You probably want {@link initShaders `initShaders`}.
  * @param gl Your WebGL context object.
  * @param filepath The path from which to `fetch` the given shader from.
- * @param shaderType Which type of shader to create.
+ * @param shaderType Which type of shader to create. One of `gl.FRAGMENT_SHADER` or
+ * `gl.VERTEX_SHADER`.
  * @returns A single compiled shader.
  */
-async function initSingleShader(
+export async function initSingleShader(
     gl: WebGL2RenderingContext,
     filepath: string,
-    shaderType: ShaderType,
+    shaderType: WebGL2RenderingContext['FRAGMENT_SHADER'] | WebGL2RenderingContext['VERTEX_SHADER'],
 ): Promise<WebGLShader> {
     const typeName = shaderType == gl.VERTEX_SHADER ? 'vertex' : 'fragment';
 
@@ -100,18 +107,4 @@ async function initSingleShader(
     }
 
     return shader;
-}
-
-
-/**
- * Strips an info log and wraps it with \```backticks\```. A tiny bit of extra processing is needed
- * to get it to print nice since WebGL returns a string with a NUL byte it in.
- * @param infoLog The info log, directly as returned by WebGL.
- */
-function formatInfoLog(infoLog: string | null): string {
-    if (infoLog === null) {
-        return '[INFO LOG MISSING?]';
-    } else {
-        return '```\n' + infoLog.replace(/\u0000/g, '').trim() + '\n```';
-    }
 }
