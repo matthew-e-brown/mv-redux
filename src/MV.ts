@@ -355,20 +355,16 @@ function mat2(): Mat2;
 
 /**
  * Creates a 2×2 matrix with the same value down its entire diagonal.
- * @param diagonal The value to repeat down the diagonal.
  */
 function mat2(diagonal: number): Mat2;
 
 /**
  * Creates a 2×2 matrix by copying another 2×2 matrix.
- * @param mat A matrix to copy entries from.
  */
 function mat2(mat: Mat2): Mat2;
 
 /**
  * Creates a 2×2 matrix out of two column vectors.
- * @param c0 A vector to copy into the first column.
- * @param c1 A vector to copy into the second column.
  */
 function mat2(c0: Vec2, c1: Vec2): Mat2;
 
@@ -983,7 +979,7 @@ function mult(u: AnyVector | AnyMatrix | number, v: AnyVector | AnyMatrix | numb
             );
         }
 
-        else if (u.type === 'mat2' && v.type === 'vec4') {
+        else if (u.type === 'mat2' && v.type === 'vec2') {
             return vec2(
                 (u[0][0] * v[0]) + (u[1][0] * v[1]),
                 (u[0][1] * v[0]) + (u[1][1] * v[1]),
@@ -1234,8 +1230,8 @@ function inverse<T extends AnyMatrix>(m: T): T {
             let t = cross(c, b);
             let u = sub(mult(y, a), mult(x, b));
             let v = sub(mult(w, c), mult(z, d));
-            const invDet = 1.0 / (dot(s, t) + dot(t, u));
 
+            const invDet = 1.0 / (dot(s, t) + dot(t, u));
             s = mult(s, invDet);
             t = mult(t, invDet);
             u = mult(u, invDet);
