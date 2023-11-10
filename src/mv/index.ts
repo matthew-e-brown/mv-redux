@@ -63,20 +63,6 @@ export function isMatrix(v: unknown): v is AnyMatrix {
     );
 }
 
-/**
- * Converts an angle from degrees to radians.
- */
-export function radians(degrees: number): number {
-    return degrees * Math.PI / 180;
-}
-
-/**
- * Converts an angle from radians to degrees.
- */
-export function degrees(radians: number): number {
-    return radians * 180 / Math.PI;
-}
-
 // -------------------------------------------------------------------------------------------------
 
 // cspell:words Bézier

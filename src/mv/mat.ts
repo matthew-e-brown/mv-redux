@@ -60,8 +60,9 @@ export function mat2(...args: (number | Mat2 | Vec2)[]): Mat2 {
     if (args.length == 0) {
         // Leave as identity
     } else if (args.length == 4) {
-        if (!args.every(n => typeof n === 'number')) {
-            throw new Error("Invalid arguments passed to 'mat2'. Expected 4 numbers.");
+        for (const n of args) {
+            if (typeof n !== 'number')
+                throw new Error("Invalid arguments passed to 'mat2'. Expected 4 numbers.");
         }
 
         out[0][0] = (args as number[])[0];
@@ -154,8 +155,9 @@ export function mat3(...args: (number | Mat3 | Vec3)[]): Mat3 {
     if (args.length == 0) {
         // Leave as identity
     } else if (args.length == 9) {
-        if (!args.every(n => typeof n === 'number')) {
-            throw new Error("Invalid arguments passed to 'mat3'. Expected 9 numbers.");
+        for (const n of args) {
+            if (typeof n !== 'number')
+                throw new Error("Invalid arguments passed to 'mat3'. Expected 9 numbers.");
         }
 
         out[0][0] = (args as number[])[0];
@@ -266,21 +268,30 @@ export function mat4(...args: (number | Mat4 | Vec4)[]): Mat4 {
     if (args.length == 0) {
         // Leave as identity
     } else if (args.length == 16) {
-        if (!args.every(n => typeof n === 'number')) {
-            throw new Error("Invalid arguments passed to 'mat4'. Expected 16 numbers.");
+        for (const n of args) {
+            if (typeof n !== 'number')
+                throw new Error("Invalid arguments passed to 'mat4'. Expected 16 numbers.");
         }
 
         out[0][0] = (args as number[])[0];
         out[0][1] = (args as number[])[1];
         out[0][2] = (args as number[])[2];
+        out[0][3] = (args as number[])[3];
 
-        out[1][0] = (args as number[])[3];
-        out[1][1] = (args as number[])[4];
-        out[1][2] = (args as number[])[5];
+        out[1][0] = (args as number[])[4];
+        out[1][1] = (args as number[])[5];
+        out[1][2] = (args as number[])[6];
+        out[1][3] = (args as number[])[7];
 
         out[2][0] = (args as number[])[6];
         out[2][1] = (args as number[])[7];
         out[2][2] = (args as number[])[8];
+        out[2][3] = (args as number[])[9];
+
+        out[2][0] = (args as number[])[6];
+        out[2][1] = (args as number[])[7];
+        out[2][2] = (args as number[])[8];
+        out[2][3] = (args as number[])[9];
     } else if (args.length == 4) {
         const [c0, c1, c2, c3] = args;
 

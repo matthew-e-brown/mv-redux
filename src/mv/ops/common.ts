@@ -38,6 +38,55 @@ export function equal<T extends AnyVector | AnyMatrix>(u: T, v: T): boolean {
 
 // -------------------------------------------------------------------------------------------------
 
+/** π over 180, the number to multiply by to convert an angle from radians to degrees. */
+export const RADIANS_TO_DEGREES = Math.PI / 180;
+/** 180 over π, the number to multiply by to convert an angle from degrees to radians. */
+export const DEGREES_TO_RADIANS = 180 / Math.PI;
+
+
+/**
+ * Converts an angle from degrees to radians.
+ */
+export function radians(degrees: number): number;
+
+/**
+ * Converts a vector of angles from degrees to radians.
+ */
+export function radians<T extends AnyVector>(degAngles: T): T;
+
+export function radians<T extends AnyVector>(d: number | T): number | T {
+    if (isVector(d))
+        return mult(d, DEGREES_TO_RADIANS);
+    else if (typeof d === 'number')
+        return d * DEGREES_TO_RADIANS;
+
+    const dType: string = (d as any)?.type ?? typeof d;
+    throw new Error(`Invalid argument passed to 'radians':\nExpected number or vector, received ${dType}.`);
+}
+
+
+/**
+ * Converts an angle from radians to degrees.
+ */
+export function degrees(radians: number): number;
+
+/**
+ * Converts a vector of angles from radians to degrees.
+ */
+export function degrees<T extends AnyVector>(radAngles: T): T;
+
+export function degrees<T extends AnyVector>(r: number | T): number | T {
+    if (isVector(r))
+        return mult(r, RADIANS_TO_DEGREES);
+    else if (typeof r === 'number')
+        return r * RADIANS_TO_DEGREES;
+
+    const rType: string = (r as any)?.type ?? typeof r;
+    throw new Error(`Invalid argument passed to 'degrees':\nExpected number or vector, received ${rType}.`);
+}
+
+// -------------------------------------------------------------------------------------------------
+
 /**
  * Computes the sum of two vectors.
  * @param u The left-hand operand.
@@ -173,7 +222,6 @@ export function sub(u: AnyVector | AnyMatrix, v: AnyVector | AnyMatrix): AnyVect
         throw new Error(msg + `Vectors must be the same length; received (${uType} - ${vType}).`);
     else if (uType.startsWith('mat') && vType.startsWith('mat'))
         throw new Error(msg + `Matrices must be the same size; received (${uType} - ${vType}).`);
-
     else
         throw new Error(msg + `Expected two matrices or vectors, received (${uType} - ${vType}).`);
 }
@@ -297,20 +345,22 @@ export function mult(u: AnyVector | AnyMatrix | number, v: AnyVector | AnyMatrix
         }
     }
 
-    else if ((isMatrix(u) || isVector(u)) && typeof v === 'number' ||
-        (isMatrix(v) || isVector(v)) && typeof u === 'number') {
-        let mat: AnyVector | AnyMatrix;
-        let num: number;
-        if (typeof v === 'number') {
+    let uMat = false; // track which one is the matrix when we do the following xor:
+    if (
+        (uMat = ((isMatrix(u) || isVector(u)) && typeof v === 'number')) ||
+        typeof u === 'number' && (isMatrix(v) || isVector(v))
+    ) {
+        let mat, num;
+        if (uMat) {
             mat = u as unknown as AnyVector | AnyMatrix;
-            num = v;
+            num = v as unknown as number;
         } else {
-            mat = v;
+            mat = v as unknown as AnyVector | AnyMatrix;
             num = u as unknown as number;
         }
 
         switch (mat.type) {
-            case 'vec4': return vec4(mat[0] * num, mat[1] * num, mat[2] * num, mat[4] * num);
+            case 'vec4': return vec4(mat[0] * num, mat[1] * num, mat[2] * num, mat[3] * num);
             case 'vec3': return vec3(mat[0] * num, mat[1] * num, mat[2] * num);
             case 'vec2': return vec2(mat[0] * num, mat[1] * num);
             case 'mat4': return mat4(

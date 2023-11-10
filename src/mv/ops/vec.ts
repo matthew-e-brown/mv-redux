@@ -63,6 +63,7 @@ export function cross(u: Vec3, v: Vec3): Vec3 {
  * Computes the magnitude of a vector.
  */
 export function magnitude(v: AnyVector): number {
+    /** @todo: inline this call to dot to avoid successive type-checking */
     if (isVector(v))
         return Math.sqrt(dot(v, v));
 
@@ -83,11 +84,28 @@ export function length(v: AnyVector): number {
  * Computes a normalized version of the given vector.
  */
 export function normalize<T extends AnyVector>(v: T): T {
+    /** @todo: inline these calls to magnitude and mult to avoid successive type-checking */
     if (isVector(v))
         return mult(v, 1 / magnitude(v));
 
     const vType: string = (v as any)?.type ?? typeof v;
-    throw new Error(`Invalid argument passed to 'normalize':\n Expected a vector, received ${vType}.`);
+    throw new Error(`Invalid argument passed to 'normalize':\nExpected a vector, received ${vType}.`);
+}
+
+/**
+ * Negates the given vector (i.e., multiplies it by -1).
+ */
+export function negate<T extends AnyVector>(v: T): T {
+    if (isVector(v)) {
+        switch (v.type) {
+            case 'vec4': return vec4(-v[0], -v[1], -v[2], -v[3]) as T;
+            case 'vec3': return vec3(-v[0], -v[1], -v[2]) as T;
+            case 'vec2': return vec2(-v[0], -v[1]) as T;
+        }
+    }
+
+    const vType: string = (v as any)?.type ?? typeof v;
+    throw new Error(`Invalid argument passed to 'negate':\nExpected a vector, received ${vType}.`);
 }
 
 /**
