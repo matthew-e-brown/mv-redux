@@ -3,10 +3,7 @@ import type { Vec3 } from './vec.js';
 
 import { isVector, vec3 } from './vec.js';
 import { isMatrix, mat3, mat4 } from './mat.js';
-
-import { sub, radians } from './ops/common.js';
-import { normalize, dot, cross } from './ops/vec.js';
-import { inverse, transpose } from './ops/mat.js';
+import { radians, sub, dot, cross, normalize, inverse, transpose  } from './ops.js';
 
 // TODO: better doc comments for these.
 

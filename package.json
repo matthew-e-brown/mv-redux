@@ -1,14 +1,24 @@
 {
-  "name": "mv-redux",
-  "author": "Matthew Brown <matthew.e.brown.17@gmail.com>",
-  "version": "0.1.0",
-  "license": "MIT",
-  "description": "Remake of matrix/vector library for COIS-4480H.",
-  "type": "module",
-  "scripts": {
-    "build": "tsc"
-  },
-  "devDependencies": {
-    "typescript": "^5.2.2"
-  }
+    "name": "mv-redux",
+    "author": "Matthew Brown <matthew.e.brown.17@gmail.com>",
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Matrix/vector library for WebGL, plus some helpers.",
+    "type": "module",
+    "exports": {
+        "mv.js": {
+            "types": "./lib/types/mv/index.d.ts",
+            "import": "./lib/mv/index.js"
+        },
+        "init-shaders.js": {
+            "types": "./lib/types/init-shaders.d.ts",
+            "import": "./lib/init-shaders.js"
+        }
+    },
+    "scripts": {
+        "build": "tsc"
+    },
+    "devDependencies": {
+        "typescript": "^5.2.2"
+    }
 }

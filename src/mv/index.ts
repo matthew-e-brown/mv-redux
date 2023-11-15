@@ -14,6 +14,13 @@ export type MatrixWithSizeof<V extends AnyVector> =
     V extends Vec2 ? Mat2 :
     never;
 
+
+export * from './vec.js';
+export * from './mat.js';
+export * from './ops.js';
+export * from './transforms.js';
+
+
 // =================================================================================================
 // Helper functions
 // =================================================================================================

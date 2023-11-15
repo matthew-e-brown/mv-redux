@@ -2,20 +2,29 @@
     "compilerOptions": {
         "target": "ES2020",
         "module": "ES2020",
-        "rootDir": "./src",
-        "outDir": "./dist",
-        "declaration": true,
+        "useDefineForClassFields": true, // we don't use any classes, but can't hurt
         "lib": [
-            "ES2023",
-            "ES2023.Array",
-            "ES2023.Collection",
+            "ES2020",
             "DOM",
+            "DOM.Iterable",
         ],
+        // Output options
+        // --------------------------------------
+        "outDir": "./lib",
+        "sourceMap": true,
+        "declaration": true,
+        "declarationDir": "./lib/types",
+        "declarationMap": true,
+        // Linting
+        // --------------------------------------
         "strict": true,
-        "noImplicitReturns": true,
         "alwaysStrict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
     },
     "include": [
-        "./src/**/*.ts",
+        "./src",
     ],
 }

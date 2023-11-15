@@ -1,9 +1,9 @@
-import type { VectorWithSizeof } from '../index.js';
-import type { AnyVector } from '../vec.js';
-import type { AnyMatrix } from '../mat.js';
+import type { VectorWithSizeof } from './index.js';
+import type { AnyVector, Vec3 } from './vec.js';
+import type { AnyMatrix } from './mat.js';
 
-import { vec2, vec3, vec4, isVector } from '../vec.js';
-import { mat2, mat3, mat4, isMatrix } from '../mat.js';
+import { vec2, vec3, vec4, isVector } from './vec.js';
+import { mat2, mat3, mat4, isMatrix } from './mat.js';
 
 
 // =================================================================================================
@@ -434,4 +434,327 @@ export function mult(u: AnyVector | AnyMatrix | number, v: AnyVector | AnyMatrix
             "    or (Vector * Vector);\n" +
             `received (${uType} * ${vType}).`
         );
+}
+
+// =================================================================================================
+// Vector operations
+// =================================================================================================
+
+/**
+ * Computes the dot product of two vectors.
+ */
+export function dot<T extends AnyVector>(u: T, v: T): number {
+    if (isVector(u) && isVector(v)) {
+        if (u.type === 'vec4' && v.type === 'vec4')
+            return u[0] * v[0] + u[1] * v[1] + u[2] * v[2] + u[3] * v[3];
+
+        else if (u.type === 'vec3' && v.type === 'vec3')
+            return u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
+
+        else if (u.type === 'vec2' && v.type === 'vec2')
+            return u[0] * v[0] + u[1] * v[1];
+    }
+
+    const uType: string = (u as any)?.type ?? typeof u;
+    const vType: string = (v as any)?.type ?? typeof v;
+    const msg = "Invalid arguments passed to 'dot':\n";
+
+    if (uType.startsWith('vec') && vType.startsWith('vec'))
+        throw new Error(msg + `Vectors must be the same length; received (${uType} \u22C5 ${vType}).`);
+
+    else
+        throw new Error(msg + `Expected two vectors, received (${uType} \u22C5 ${vType}).`);
+}
+
+/**
+ * Computes the cross product of two 3-dimensional vectors.
+ */
+export function cross(u: Vec3, v: Vec3): Vec3 {
+    if (isVector(u) && isVector(v) && u.type === 'vec3' && v.type === 'vec3') {
+        return vec3(
+            u[1] * v[2] - u[2] * v[1],
+            u[2] * v[0] - u[0] * v[2],
+            u[0] * v[1] - u[1] * v[0],
+        );
+    }
+
+    const uType: string = (u as any)?.type ?? typeof u;
+    const vType: string = (v as any)?.type ?? typeof v;
+    const msg = "Invalid arguments passed to 'cross':\n";
+
+    if (uType.startsWith('vec') && vType.startsWith('vec'))
+        throw new Error(msg + `Received (${uType} \u00D7 ${vType}); cross product is only valid for (vec3 \u00D7 vec3).`);
+
+    else
+        throw new Error(msg + `Expected two 3D vectors, received (${uType} \u00D7 ${vType})`);
+}
+
+/**
+ * Computes the magnitude of a vector.
+ */
+export function magnitude(v: AnyVector): number {
+    /** @todo: inline this call to dot to avoid successive type-checking */
+    if (isVector(v))
+        return Math.sqrt(dot(v, v));
+
+    const vType: string = (v as any)?.type ?? typeof v;
+    throw new Error(`Invalid argument passed to 'magnitude':\nExpected a vector, received ${vType}.`);
+}
+
+/**
+ * Computes the length (magnitude) of a vector.
+ *
+ * This function is an alias for {@link magnitude `magnitude`}.
+ */
+export function length(v: AnyVector): number {
+    return magnitude(v);
+};
+
+/**
+ * Computes a normalized version of the given vector.
+ */
+export function normalize<T extends AnyVector>(v: T): T {
+    /** @todo: inline these calls to magnitude and mult to avoid successive type-checking */
+    if (isVector(v))
+        return mult(v, 1 / magnitude(v));
+
+    const vType: string = (v as any)?.type ?? typeof v;
+    throw new Error(`Invalid argument passed to 'normalize':\nExpected a vector, received ${vType}.`);
+}
+
+/**
+ * Negates the given vector (i.e., multiplies it by -1).
+ */
+export function negate<T extends AnyVector>(v: T): T {
+    if (isVector(v)) {
+        switch (v.type) {
+            case 'vec4': return vec4(-v[0], -v[1], -v[2], -v[3]) as T;
+            case 'vec3': return vec3(-v[0], -v[1], -v[2]) as T;
+            case 'vec2': return vec2(-v[0], -v[1]) as T;
+        }
+    }
+
+    const vType: string = (v as any)?.type ?? typeof v;
+    throw new Error(`Invalid argument passed to 'negate':\nExpected a vector, received ${vType}.`);
+}
+
+/**
+ * Mixes two vectors or two numbers together with ratio `s`.
+ *
+ * `u` is multiplied by `1 - s` before being added to `s * v`.
+ * @param u The first vector or number.
+ * @param v The second vector or number.
+ * @param s A number from 0 to 1; the ratio of `u` to `v`.
+ */
+export function mix<T extends AnyVector | number>(u: T, v: T, s: number): T {
+    if (typeof s !== 'number') {
+        const sType: string = (s as any)?.type ?? typeof s;
+        throw new Error(`Invalid argument passed to 'mix':\nExpected 's' to be a number; received ${sType}.`);
+    }
+
+    // Clamp to [0, 1]
+    s = Math.min(1, Math.max(s, 0));
+    const r = 1 - s;
+
+    if (typeof u === 'number' && typeof v === 'number') {
+        return (r * u + s * v) as T;
+    } else if (isVector(u) && isVector(v)) {
+        if (u.type == 'vec2' && v.type == 'vec2')
+            return vec2(r * u[0] + s * v[0], r * u[1] + s * v[1]) as T;
+
+        else if (u.type == 'vec3' && v.type == 'vec3')
+            return vec3(r * u[0] + s * v[0], r * u[1] + s * v[1], r * u[2] + s * v[2]) as T;
+
+        else if (u.type == 'vec4' && v.type == 'vec4')
+            return vec4(r * u[0] + s * v[0], r * u[1] + s * v[1], r * u[2] + s * v[2], r * u[3] + s * v[3]) as T;
+    }
+
+    const uType: string = (u as any)?.type ?? typeof u;
+    const vType: string = (v as any)?.type ?? typeof v;
+    const msg = "Invalid arguments passed to 'mix':\n";
+
+    if (uType.startsWith('vec') && vType.startsWith('vec'))
+        throw new Error(msg + `Vectors must be the same length; received (${uType}, ${vType}).`);
+
+    else
+        throw new Error(msg + `Expected either three numbers or two vectors and a number; received (${uType}, ${vType}, number).`);
+}
+
+// =================================================================================================
+// Matrix operations
+// =================================================================================================
+
+/**
+ * Computes the determinant of a matrix.
+ */
+export function det(m: AnyMatrix): number {
+    if (isMatrix(m)) {
+        if (m.type === 'mat4') {
+            /* Using four intermediate vectors (eq. 1.97) computed using the column vectors that
+             * span the top three rows, and the four values in the bottom row (eq. 1.96), we can
+             * compute the determinant of a 4D matrix without the need to find all 16 cofactors.
+             * Each of those cofactors is a 3×3 determinant, so this method greatly reduces
+             * overhead. Equations referenced from Foundations of Game Dev, vol. 1. */
+
+            // Get four column vectors, but only top 3 rows of them
+            const a = vec3(m[0]);
+            const b = vec3(m[1]);
+            const c = vec3(m[2]);
+            const d = vec3(m[3]);
+
+            // Get the bottom row
+            const x = m[0][3];
+            const y = m[1][3];
+            const z = m[2][3];
+            const w = m[3][3];
+
+            // Compute intermediate vectors
+            const s = cross(a, b);
+            const t = cross(c, b);
+            const u = sub(mult(y, a), mult(x, b));
+            const v = sub(mult(w, c), mult(z, d));
+
+            // Determinant
+            return dot(s, v) + dot(t, u);
+        }
+
+        else if (m.type === 'mat3') {
+            /* The determinant of a 3D matrix is equal to the scalar triple product of its 3 column
+             * vectors. See equations 1.94 and 1.95 (pg. 47-48) in Foundations of Game Dev, vol. 1.
+             * */
+            const a = vec3(m[0]);
+            const b = vec3(m[1]);
+            const c = vec3(m[2]);
+            return dot(cross(a, b), c);
+        }
+
+        else if (m.type === 'mat2') {
+            return m[0][0] * m[1][1] - m[1][0] * m[0][1];
+        }
+    }
+
+    const mType: string = (m as any)?.type ?? typeof m;
+    throw new Error(`Invalid argument passed to 'det':\nExpected a matrix, received ${mType}.`);
+}
+
+/**
+ * Computes the inverse of a matrix.
+ *
+ * @note Since it doesn't really come up that often in computer graphics, this function doesn't
+ * bother to check if the matrix is invertible (i.e. if its determinant is zero). It would probably
+ * be undesired if such a commonly used function threw an error mid-runtime because of an edge-case
+ * like that.
+ */
+export function inverse<T extends AnyMatrix>(m: T): T {
+    if (isMatrix(m)) {
+        if (m.type === 'mat4') {
+            /* We can make use of the same strategy employed by `det` above to efficiently compute
+             * the matrix's inverse. See that function and the equations it references, as well as
+             * equation 1.99 in Foundations of Game Dev, vol. 1. This implementation is modelled
+             * specifically after listing 1.11. */
+
+            // Get four column vectors, but only top 3 rows of them
+            const a = vec3(m[0]);
+            const b = vec3(m[1]);
+            const c = vec3(m[2]);
+            const d = vec3(m[3]);
+
+            // Get the bottom row
+            const x = m[0][3];
+            const y = m[1][3];
+            const z = m[2][3];
+            const w = m[3][3];
+
+            // Compute intermediate vectors
+            let s = cross(a, b);
+            let t = cross(c, b);
+            let u = sub(mult(y, a), mult(x, b));
+            let v = sub(mult(w, c), mult(z, d));
+
+            const invDet = 1.0 / (dot(s, t) + dot(t, u));
+            s = mult(s, invDet);
+            t = mult(t, invDet);
+            u = mult(u, invDet);
+            v = mult(v, invDet);
+
+            const r0 = mult(add(cross(b, v), t), y);
+            const r1 = mult(sub(cross(v, a), t), x);
+            const r2 = mult(add(cross(d, u), s), w);
+            const r3 = mult(sub(cross(u, c), s), z);
+
+            return mat4(
+                r0[0], r1[0], r2[0], r3[0],
+                r0[1], r1[1], r2[1], r3[1],
+                r0[2], r1[2], r2[2], r3[2],
+                -dot(b, t), dot(a, t), -dot(d, s), dot(c, s),
+            ) as T;
+        }
+
+        else if (m.type === 'mat3') {
+            /* The inverse of a 3D matrix is the cross product of its three column vectors, laid out
+             * row-by-row, multiplied by its determinant's reciprocal. See equations 1.94 and 1.95,
+             * listing 1.10 in Foundations of Game Dev, vol. 1. */
+
+            const a = vec3(m[0]);
+            const b = vec3(m[1]);
+            const c = vec3(m[2]);
+
+            const r0 = cross(b, c);
+            const r1 = cross(c, a);
+            const r2 = cross(a, b);
+
+            const invDet = 1.0 / dot(r2, c);
+            return mat3(
+                r0[0] * invDet, r1[0] * invDet, r2[0] * invDet,
+                r0[1] * invDet, r1[1] * invDet, r2[1] * invDet,
+                r0[2] * invDet, r1[2] * invDet, r2[2] * invDet,
+            ) as T;
+        }
+
+        else if (m.type === 'mat2') {
+            const invDet = 1.0 / det(m);
+            const invNeg = -invDet;
+            return mat2(
+                invDet * m[1][1], invNeg * m[0][1],
+                invNeg * m[1][0], invDet * m[0][0],
+            ) as T;
+        }
+    }
+
+    const mType: string = (m as any)?.type ?? typeof m;
+    throw new Error(`Invalid argument passed to 'inverse':\nExpected a matrix, received ${mType}.`);
+}
+
+/**
+ * Computes the transpose of a matrix.
+ */
+export function transpose<T extends AnyMatrix>(m: T): T {
+    if (isMatrix(m)) {
+        if (m.type == 'mat4') {
+            return mat4(
+                m[0][0], m[1][0], m[2][0], m[3][0],
+                m[0][1], m[1][1], m[2][1], m[3][1],
+                m[0][2], m[1][2], m[2][2], m[3][2],
+                m[0][3], m[1][3], m[2][3], m[3][3],
+            ) as T;
+        }
+
+        else if (m.type == 'mat3') {
+            return mat3(
+                m[0][0], m[1][0], m[2][0],
+                m[0][1], m[1][1], m[2][1],
+                m[0][2], m[1][2], m[2][2],
+            ) as T;
+        }
+
+        else if (m.type == 'mat2') {
+            return mat2(
+                m[0][0], m[1][0],
+                m[0][1], m[1][1],
+            ) as T;
+        }
+    }
+
+    const mType: string = (m as any)?.type ?? typeof m;
+    throw new Error(`Invalid argument passed to 'transpose':\nExpected a matrix, received ${mType}.`);
 }
