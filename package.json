@@ -5,6 +5,10 @@
     "license": "MIT",
     "description": "Matrix/vector library for WebGL, plus some helpers.",
     "type": "module",
+    "files": [
+        "./src",
+        "./lib"
+    ],
     "exports": {
         "mv.js": {
             "types": "./lib/types/mv/index.d.ts",
