@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "license": "MIT",
   "description": "Remake of matrix/vector library for COIS-4480H.",
+  "type": "module",
   "scripts": {
     "build": "tsc"
   },

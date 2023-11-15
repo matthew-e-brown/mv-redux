@@ -4,10 +4,7 @@
         "module": "ES2020",
         "rootDir": "./src",
         "outDir": "./dist",
-        "declarationDir": "./dist/types",
-        "declarationMap": true,
         "declaration": true,
-        "sourceMap": true,
         "lib": [
             "ES2023",
             "ES2023.Array",

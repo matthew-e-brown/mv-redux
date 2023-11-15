@@ -8,4 +8,6 @@ export * from './mv/ops/common.js';
 export * from './mv/ops/vec.js';
 export * from './mv/ops/mat.js';
 
+export * from './mv/transforms.js';
+
 export * from './webgl.js';

@@ -1,11 +1,12 @@
-import type { Mat4 } from './mat.js';
+import type { Mat3, Mat4 } from './mat.js';
 import type { Vec3 } from './vec.js';
 
 import { isVector, vec3 } from './vec.js';
-import { mat4 } from './mat.js';
+import { isMatrix, mat3, mat4 } from './mat.js';
 
-import { normalize, dot, cross } from './ops/vec.js';
 import { sub, radians } from './ops/common.js';
+import { normalize, dot, cross } from './ops/vec.js';
+import { inverse, transpose } from './ops/mat.js';
 
 // TODO: better doc comments for these.
 
@@ -318,4 +319,152 @@ export function orthographicMatrix(
     result[2][3] = -(near + far) / depth;
 
     return result;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/**
+ * Constructs a normal matrix from a regular transformation matrix.
+ * @param m The transformation matrix to create a normal matrix from.
+ * @param asMat3 Whether or not the result should be trimmed down from a `Mat4` to a `Mat3`.
+ * Defaults to `false`.
+ */
+export function normalMatrix(m: Mat4, asMat3?: false): Mat4;
+
+/**
+ * Constructs a normal matrix from a regular transformation matrix.
+ * @param m The transformation matrix to create a normal matrix from.
+ * @param asMat3 Whether or not the result should be trimmed down from a `Mat4` to a `Mat3`.
+ * Defaults to `false`.
+ */
+export function normalMatrix(m: Mat4, asMat3: true): Mat3;
+
+export function normalMatrix(m: Mat4, asMat3 = false): Mat4 | Mat3 {
+    if (isMatrix(m) && m.type === 'mat4') {
+        const n = inverse(transpose(m));
+
+        if (asMat3) {
+            return mat3(
+                n[0][0], n[0][1], n[0][2],
+                n[1][0], n[1][1], n[1][2],
+                n[2][0], n[2][1], n[2][2],
+            );
+        } else {
+            return n;
+        }
+    }
+
+    const mType: string = (m as any)?.type ?? typeof m;
+    throw new Error(
+        "Invalid argument passed to 'normalMatrix':\n" +
+        `Expected a 4D matrix, received ${mType}.`
+    );
+}
+
+// -------------------------------------------------------------------------------------------------
+
+// Backwards-compatible aliases
+
+/**
+ * Creates a translation matrix.
+ *
+ * @deprecated This function has been replaced with {@link translationMatrix}, which accepts more
+ * versatile inputs.
+ */
+export function translate(x: number, y: number, z: number): Mat4 {
+    return translationMatrix(x, y, z);
+}
+
+/**
+ * Creates an axis-angle rotation matrix.
+ *
+ * @deprecated This function, as well as {@link rotateX}, {@link rotateY}, and {@link rotateZ}, have
+ * all been replaced by {@link rotationMatrix}, which handles all rotation matrices.
+ */
+export function rotate(angle: number, axis: [number, number, number]): Mat4;
+
+/**
+ * Creates an axis-angle rotation matrix.
+ *
+ * @deprecated This function, as well as {@link rotateX}, {@link rotateY}, and {@link rotateZ}, have
+ * all been replaced by {@link rotationMatrix}, which handles all rotation matrices.
+ */
+export function rotate(angle: number, axisX: number, axisY: number, axisZ: number): Mat4;
+
+export function rotate(...args: (number | number[])[]): Mat4 {
+    if (args.length === 2) {
+        // We let this function do the error checking. Note that the old version takes angle first.
+        return rotationMatrix(args[1] as Vec3, args[0] as number);
+    } else if (args.length === 4) {
+        const axis = vec3(args[1], args[2], args[3]);
+        return rotationMatrix(axis, args[0] as number);
+    } else {
+        // @ts-ignore We just toss all their arguments into the main function and let it do
+        // error-handling.
+        return rotationMatrix(...args);
+    }
+}
+
+/**
+ * Constructs a rotation matrix that will rotate things around the X-axis.
+ *
+ * @deprecated This function has been replaced with {@link rotationMatrix}, which accepts more
+ * versatile inputs.
+ */
+export function rotateX(theta: number): Mat4 {
+    return rotationMatrix('x', theta);
+}
+
+/**
+ * Constructs a rotation matrix that will rotate things around the Y-axis.
+ *
+ * @deprecated This function has been replaced with {@link rotationMatrix}, which accepts more
+ * versatile inputs.
+ */
+export function rotateY(theta: number): Mat4 {
+    return rotationMatrix('y', theta);
+}
+
+/**
+ * Constructs a rotation matrix that will rotate things around the Z-axis.
+ *
+ * @deprecated This function has been replaced with {@link rotationMatrix}, which accepts more
+ * versatile inputs.
+ */
+export function rotateZ(theta: number): Mat4 {
+    return rotationMatrix('z', theta);
+}
+
+/**
+ * Constructs a scale matrix.
+ *
+ * @deprecated This function has been replaced with {@link scaleMatrix}, which accepts more
+ * versatile inputs.
+ */
+export function scale(x: number, y: number, z: number) {
+    return scaleMatrix(x, y, z);
+}
+
+/**
+ * @deprecated This function has been renamed to {@link lookAtMatrix} for consistency with the other
+ * transformation matrix functions.
+ */
+export function lookAt(eye: Vec3, at: Vec3, up: Vec3): Mat4 {
+    return lookAtMatrix(eye, at, up ?? null);
+}
+
+/**
+ * @deprecated This function has been renamed to {@link orthographicMatrix} for consistency with the
+ * other transformation matrix functions.
+ */
+export function ortho(left: number, right: number, bottom: number, top: number, near: number, far: number): Mat4 {
+    return orthographicMatrix(left, right, bottom, top, near, far);
+}
+
+/**
+ * @deprecated This function has been renamed to {@link perspectiveMatrix} for consistency with the
+ * other transformation matrix functions.
+ */
+export function perspective(fovY: number, aspect: number, near: number, far: number) {
+    return perspectiveMatrix(fovY, aspect, near, far);
 }
