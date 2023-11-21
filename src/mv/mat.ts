@@ -283,15 +283,15 @@ export function mat4(...args: (number | Mat4 | Vec4)[]): Mat4 {
         out[1][2] = (args as number[])[6];
         out[1][3] = (args as number[])[7];
 
-        out[2][0] = (args as number[])[6];
-        out[2][1] = (args as number[])[7];
-        out[2][2] = (args as number[])[8];
-        out[2][3] = (args as number[])[9];
+        out[2][0] = (args as number[])[8];
+        out[2][1] = (args as number[])[9];
+        out[2][2] = (args as number[])[10];
+        out[2][3] = (args as number[])[11];
 
-        out[2][0] = (args as number[])[6];
-        out[2][1] = (args as number[])[7];
-        out[2][2] = (args as number[])[8];
-        out[2][3] = (args as number[])[9];
+        out[2][0] = (args as number[])[12];
+        out[2][1] = (args as number[])[13];
+        out[2][2] = (args as number[])[14];
+        out[2][3] = (args as number[])[15];
     } else if (args.length == 4) {
         const [c0, c1, c2, c3] = args;
 
