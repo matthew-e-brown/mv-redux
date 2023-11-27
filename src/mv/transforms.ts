@@ -3,9 +3,7 @@ import type { Vec3 } from './vec.js';
 
 import { isVector, vec3 } from './vec.js';
 import { isMatrix, mat3, mat4 } from './mat.js';
-import { radians, sub, dot, cross, normalize, inverse, transpose  } from './ops.js';
-
-// TODO: better doc comments for these.
+import { radians, sub, dot, cross, normalize, inverse, transpose } from './ops.js';
 
 // -------------------------------------------------------------------------------------------------
 
@@ -86,19 +84,19 @@ export function rotationMatrix(axis: 'x' | 'y' | 'z' | Vec3, angle: number): Mat
         switch (axis.toLowerCase()) {
             case 'x': return mat4(
                 1.0, 0.0, 0.0, 0.0,
-                0.0, cos, -sin, 0.0,
-                0.0, sin, cos, 0.0,
+                0.0, cos, sin, 0.0,
+                0.0, -sin, cos, 0.0,
                 0.0, 0.0, 0.0, 1.0,
             );
             case 'y': return mat4(
-                cos, 0.0, sin, 0.0,
+                cos, 0.0, -sin, 0.0,
                 0.0, 1.0, 0.0, 0.0,
-                -sin, 0.0, cos, 0.0,
+                sin, 0.0, cos, 0.0,
                 0.0, 0.0, 0.0, 1.0,
             );
             case 'z': return mat4(
-                cos, -sin, 0.0, 0.0,
-                sin, cos, 0.0, 0.0,
+                cos, sin, 0.0, 0.0,
+                -sin, cos, 0.0, 0.0,
                 0.0, 0.0, 1.0, 0.0,
                 0.0, 0.0, 0.0, 1.0,
             );
@@ -109,9 +107,9 @@ export function rotationMatrix(axis: 'x' | 'y' | 'z' | Vec3, angle: number): Mat
         const [x, y, z] = normalize(axis);
         const omc = 1.0 - cos; // "one minus cosine"
         return mat4(
-            (cos + x * x * omc), (y * x * omc + z * sin), (z * x * omc - y * sin), 0.0,
-            (x * y * omc - z * sin), (cos + y * y * cos), (z * y * omc + x * sin), 0.0,
-            (x * z * omc + y * sin), (y * z * omc - x * sin), (cos + z * z * omc), 0.0,
+            (cos + x * x * omc), (x * y * omc - z * sin), (x * z * omc + y * sin), 0.0,
+            (y * x * omc + z * sin), (cos + y * y * cos), (y * z * omc - x * sin), 0.0,
+            (z * x * omc - y * sin), (z * y * omc + x * sin), (cos + z * z * omc), 0.0,
             0.0, 0.0, 0.0, 1.0,
         );
     }
@@ -207,10 +205,10 @@ export function lookAtMatrix(eyePosition: Vec3, target: Vec3, upVec: Vec3 = vec3
         const yTrans = -dot(yAxis, eyePosition);
 
         return mat4(
-            xAxis[0], xAxis[1], xAxis[2], xTrans,
-            yAxis[0], yAxis[1], yAxis[2], yTrans,
-            zAxis[0], zAxis[1], zAxis[2], zTrans,
-            0, 0, 0, 1,
+            xAxis[0], yAxis[0], zAxis[0], 0,
+            xAxis[1], yAxis[1], zAxis[1], 0,
+            xAxis[2], yAxis[2], zAxis[2], 0,
+            xTrans, yTrans, zTrans, 1,
         );
     }
 

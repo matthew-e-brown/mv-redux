@@ -667,11 +667,11 @@ export function inverse<T extends AnyMatrix>(m: T): T {
 
             // Compute intermediate vectors
             let s = cross(a, b);
-            let t = cross(c, b);
+            let t = cross(c, d);
             let u = sub(mult(y, a), mult(x, b));
             let v = sub(mult(w, c), mult(z, d));
 
-            const invDet = 1.0 / (dot(s, t) + dot(t, u));
+            const invDet = 1.0 / (dot(s, v) + dot(t, u));
             s = mult(s, invDet);
             t = mult(t, invDet);
             u = mult(u, invDet);
