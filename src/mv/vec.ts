@@ -1,6 +1,23 @@
-export type Vec2 = { type: 'vec2' } & [number, number];
-export type Vec3 = { type: 'vec3' } & [number, number, number];
-export type Vec4 = { type: 'vec4' } & [number, number, number, number];
+export type Vec2 = [number, number] & {
+    type: 'vec2',
+    get x(): number, set x(n: number),
+    get y(): number, set y(n: number),
+};
+
+export type Vec3 = [number, number, number] & {
+    type: 'vec3',
+    get x(): number, set x(n: number),
+    get y(): number, set y(n: number),
+    get z(): number, set z(n: number),
+};
+
+export type Vec4 = [number, number, number, number] & {
+    type: 'vec4',
+    get x(): number, set x(n: number),
+    get y(): number, set y(n: number),
+    get z(): number, set z(n: number),
+    get w(): number, set w(n: number),
+};
 
 export type AnyVector = Vec2 | Vec3 | Vec4;
 
@@ -50,8 +67,11 @@ export function vec2(value: number): Vec2;
 export function vec2(...values: (number | number[] | AnyVector)[]): Vec2
 
 export function vec2(...args: (number | number[] | AnyVector)[]): Vec2 {
-    const out: Vec2 = [0, 0] as Vec2;
-    out.type = 'vec2';
+    const out = Object.defineProperties([0, 0], {
+        type: { value: 'vec2', writable: false, enumerable: false },
+        x: { get() { return this[0]; }, set(n: number) { this[0] = n; }, enumerable: false },
+        y: { get() { return this[1]; }, set(n: number) { this[1] = n; }, enumerable: false },
+    }) as Vec2;
 
     const values = args.flat(1);
     if (!values.every(n => typeof n === 'number')) {
@@ -117,8 +137,12 @@ export function vec3(value: number): Vec3;
 export function vec3(...values: (number | number[] | AnyVector)[]): Vec3;
 
 export function vec3(...args: (number | number[] | AnyVector)[]): Vec3 {
-    const out: Vec3 = [0, 0, 0] as Vec3;
-    out.type = 'vec3';
+    const out = Object.defineProperties([0, 0, 0], {
+        type: { value: 'vec3', writable: false, enumerable: false },
+        x: { get() { return this[0]; }, set(n: number) { this[0] = n; }, enumerable: false },
+        y: { get() { return this[1]; }, set(n: number) { this[1] = n; }, enumerable: false },
+        z: { get() { return this[2]; }, set(n: number) { this[2] = n; }, enumerable: false },
+    }) as Vec3;
 
     const values = args.flat(1);
     if (!values.every(n => typeof n === 'number')) {
@@ -191,8 +215,13 @@ export function vec4(value: number): Vec4;
 export function vec4(...values: (number | number[] | AnyVector)[]): Vec4;
 
 export function vec4(...args: (number | number[] | AnyVector)[]): Vec4 {
-    const out: Vec4 = [0, 0, 0, 0] as Vec4;
-    out.type = 'vec4';
+    const out = Object.defineProperties([0, 0, 0, 0], {
+        type: { value: 'vec4', writable: false, enumerable: false, },
+        x: { get() { return this[0]; }, set(n: number) { this[0] = n; }, enumerable: false },
+        y: { get() { return this[1]; }, set(n: number) { this[1] = n; }, enumerable: false },
+        z: { get() { return this[2]; }, set(n: number) { this[2] = n; }, enumerable: false },
+        w: { get() { return this[3]; }, set(n: number) { this[3] = n; }, enumerable: false },
+    }) as Vec4;
 
     const values = args.flat(1);
     if (!values.every(n => typeof n === 'number')) {
