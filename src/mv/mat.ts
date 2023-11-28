@@ -7,9 +7,7 @@ export type Mat4 = { type: 'mat4' } & [[number, number, number, number], [number
 
 export type AnyMatrix = Mat2 | Mat3 | Mat4;
 
-
 export { isMatrix } from './index.js';
-
 
 // =================================================================================================
 // Matrix constructors

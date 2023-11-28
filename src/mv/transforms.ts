@@ -332,21 +332,18 @@ export function normalMatrix(m: Mat4, asMat3?: false): Mat4;
  * @param asMat3 Whether or not the result should be trimmed down from a `Mat4` to a `Mat3`.
  * Defaults to `false`.
  */
-export function normalMatrix(m: Mat4, asMat3: true): Mat3;
+export function normalMatrix(m: Mat4, asMat3: true): Mat3; // Overload for different return type
 
-export function normalMatrix(m: Mat4, asMat3 = false): Mat4 | Mat3 {
-    if (isMatrix(m) && m.type === 'mat4') {
-        const n = inverse(transpose(m));
+/**
+ * Constructs a normal matrix from a regular transformation matrix.
+ * @param m The transformation matrix to create a normal matrix from.
+ */
+export function normalMatrix(m: Mat3): Mat3;
 
-        if (asMat3) {
-            return mat3(
-                n[0][0], n[0][1], n[0][2],
-                n[1][0], n[1][1], n[1][2],
-                n[2][0], n[2][1], n[2][2],
-            );
-        } else {
-            return n;
-        }
+export function normalMatrix(m: Mat3 | Mat4, asMat3 = false): Mat4 | Mat3 {
+    if (isMatrix(m) && (m.type === 'mat4' || m.type === 'mat3')) {
+        if (asMat3) m = mat3(m);
+        return inverse(transpose(m));
     }
 
     const mType: string = (m as any)?.type ?? typeof m;

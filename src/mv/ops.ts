@@ -677,10 +677,10 @@ export function inverse<T extends AnyMatrix>(m: T): T {
             u = mult(u, invDet);
             v = mult(v, invDet);
 
-            const r0 = mult(add(cross(b, v), t), y);
-            const r1 = mult(sub(cross(v, a), t), x);
-            const r2 = mult(add(cross(d, u), s), w);
-            const r3 = mult(sub(cross(u, c), s), z);
+            const r0 = add(cross(b, v), mult(y, t));
+            const r1 = sub(cross(v, a), mult(x, t));
+            const r2 = add(cross(d, u), mult(w, s));
+            const r3 = sub(cross(u, c), mult(z, s));
 
             return mat4(
                 r0[0], r1[0], r2[0], r3[0],
