@@ -41,28 +41,42 @@ export function mat2(): Mat2;
 export function mat2(diagonal: number): Mat2;
 
 /**
- * Creates a 2×2 matrix by copying another 2×2 matrix.
+ * Creates a 2×2 matrix by copying another matrix.
+ *
+ * If the source matrix is larger than 2×2, then only the top-left corner will be copied,
+ * effectively truncating it.
  */
-export function mat2(mat: Mat2): Mat2;
+export function mat2(mat: AnyMatrix): Mat2;
 
 /**
  * Creates a 2×2 matrix out of two column vectors.
  */
 export function mat2(c0: Vec2, c1: Vec2): Mat2;
 
-export function mat2(...args: (number | Mat2 | Vec2)[]): Mat2 {
+export function mat2(...args: (number | AnyMatrix | Vec2)[]): Mat2 {
     const out: Mat2 = [
         [1, 0],
         [0, 1],
     ] as Mat2;
     out.type = 'mat2';
 
+    const argError = () => new Error(
+        "Invalid arguments passed to 'mat2':\n" +
+        "Expected either:\n" +
+        "    0 arguments,\n" +
+        "    4 numbers,\n" +
+        "    1 number,\n" +
+        "    1 matrix,\n" +
+        "    2 vec2s;\n" +
+        `received: (${args.map(x => (x as any).type ?? typeof x).join(', ')})`
+    );
+
     if (args.length == 0) {
         // Leave as identity
     } else if (args.length == 4) {
         for (const n of args) {
             if (typeof n !== 'number')
-                throw new Error("Invalid arguments passed to 'mat2'. Expected 4 numbers.");
+                throw argError();
         }
 
         out[0][0] = (args as number[])[0];
@@ -74,28 +88,27 @@ export function mat2(...args: (number | Mat2 | Vec2)[]): Mat2 {
         const [c0, c1] = args;
 
         if (!isVector(c0) || !isVector(c1)) {
-            throw new Error("Invalid arguments passed to 'mat2'. Expected 2 column vectors.");
+            throw argError();
         } else if (c0.length != 2 || c1.length != 2) {
-            throw new Error("Invalid arguments passed to 'mat2'. Column vectors should be of size 2.");
+            throw argError();
         }
 
-        out[0] = [...c0] as Vec2;
-        out[1] = [...c1] as Vec2;
+        out[0] = Array.from(c0) as Vec2;
+        out[1] = Array.from(c1) as Vec2;
     } else if (args.length == 1) {
         const [m] = args;
 
         if (typeof m === 'number') {
             out[0][0] = m;
             out[1][1] = m;
-        } else if (isMatrix(m) && m.length == 2) {
-            // Copy columns
-            out[0] = [...m[0]];
-            out[1] = [...m[1]];
+        } else if (isMatrix(m)) {
+            out[0][0] = m[0][0]; out[0][1] = m[0][1];
+            out[1][0] = m[1][0]; out[1][1] = m[1][1];
         } else {
-            throw new Error("Invalid argument passed to 'mat2'. Expected a single scalar or a Mat2.");
+            throw argError();
         }
     } else {
-        throw new Error("Invalid arguments passed to 'mat2'. Expected 0 numbers, 4 numbers, 1 Mat2, or 2 Vec2s.");
+        throw argError();
     }
 
     return out;
@@ -135,16 +148,20 @@ export function mat3(): Mat3;
 export function mat3(diagonal: number): Mat3;
 
 /**
- * Creates a 3×3 matrix by copying another 3×3 matrix.
+ * Creates a 3×3 matrix by copying another matrix.
+ *
+ * If the source matrix is smaller than 3×3, its entries will fill the top-left corner of the
+ * resulting matrix. If it is _larger_ than 3×3, then only the top-left corner will be copied,
+ * effectively truncating the source matrix.
  */
-export function mat3(mat: Mat3): Mat3;
+export function mat3(mat: AnyMatrix): Mat3;
 
 /**
  * Creates a 3×3 matrix out of three column vectors.
  */
 export function mat3(c0: Vec3, c1: Vec3, c2: Vec3): Mat3;
 
-export function mat3(...args: (number | Mat3 | Vec3)[]): Mat3 {
+export function mat3(...args: (number | AnyMatrix | Vec3)[]): Mat3 {
     const out: Mat3 = [
         [1, 0, 0],
         [0, 1, 0],
@@ -152,12 +169,22 @@ export function mat3(...args: (number | Mat3 | Vec3)[]): Mat3 {
     ] as Mat3;
     out.type = 'mat3';
 
+    const argError = () => new Error(
+        "Invalid arguments passed to 'mat3':\n" +
+        "Expected either:\n" +
+        "    0 arguments,\n" +
+        "    9 numbers,\n" +
+        "    1 number,\n" +
+        "    1 matrix, or\n" +
+        "    3 vec3s;\n" +
+        `received: (${args.map(x => (x as any).type ?? typeof x).join(', ')})`
+    );
+
     if (args.length == 0) {
         // Leave as identity
     } else if (args.length == 9) {
         for (const n of args) {
-            if (typeof n !== 'number')
-                throw new Error("Invalid arguments passed to 'mat3'. Expected 9 numbers.");
+            if (typeof n !== 'number') throw argError();
         }
 
         out[0][0] = (args as number[])[0];
@@ -175,14 +202,14 @@ export function mat3(...args: (number | Mat3 | Vec3)[]): Mat3 {
         const [c0, c1, c2] = args;
 
         if (!isVector(c0) || !isVector(c1) || !isVector(c2)) {
-            throw new Error("Invalid arguments passed to 'mat3'. Expected 3 column vectors.");
+            throw argError();
         } else if (c0.length != 3 || c1.length != 3 || c2.length != 3) {
-            throw new Error("Invalid arguments passed to 'mat3'. Column vectors should be of size 3.");
+            throw argError();
         }
 
-        out[0] = [...c0] as Vec3;
-        out[1] = [...c1] as Vec3;
-        out[2] = [...c2] as Vec3;
+        out[0] = Array.from(c0) as Vec3;
+        out[1] = Array.from(c1) as Vec3;
+        out[2] = Array.from(c2) as Vec3;
     } else if (args.length == 1) {
         const [m] = args;
 
@@ -190,16 +217,22 @@ export function mat3(...args: (number | Mat3 | Vec3)[]): Mat3 {
             out[0][0] = m;
             out[1][1] = m;
             out[2][2] = m;
-        } else if (isMatrix(m) && m.length == 3) {
-            // Copy columns
-            out[0] = [...m[0]];
-            out[1] = [...m[1]];
-            out[2] = [...m[2]];
+        } else if (isMatrix(m)) {
+            if (m.type === 'mat4' || m.type == 'mat3') {
+                out[0][0] = m[0][0]; out[0][1] = m[0][1]; out[0][2] = m[0][2];
+                out[1][0] = m[1][0]; out[1][1] = m[1][1]; out[1][2] = m[1][2];
+                out[2][0] = m[2][0]; out[2][1] = m[2][1]; out[2][2] = m[2][2];
+            } else if (m.type === 'mat2') {
+                out[0][0] = m[0][0]; out[0][1] = m[0][1];
+                out[1][0] = m[1][0]; out[1][1] = m[1][1];
+            } else {
+                throw argError();
+            }
         } else {
-            throw new Error("Invalid argument passed to 'mat3'. Expected a single scalar or a Mat3.");
+            throw argError();
         }
     } else {
-        throw new Error("Invalid arguments passed to 'mat3'. Expected 0 numbers, 9 numbers, 1 Mat3, or 3 Vec3s.");
+        throw argError();
     }
 
     return out;
@@ -247,16 +280,19 @@ export function mat4(): Mat4;
 export function mat4(diagonal: number): Mat4;
 
 /**
- * Creates a 4×4 matrix by copying another 4×4 matrix.
+ * Creates a 4×4 matrix by copying another matrix.
+ *
+ * If the source matrix is smaller than 4×4, its entries will fill the top-left corner of the
+ * resulting matrix.
  */
-export function mat4(mat: Mat4): Mat4;
+export function mat4(mat: AnyMatrix): Mat4;
 
 /**
  * Creates a 4×4 matrix out of four column vectors.
  */
 export function mat4(c0: Vec4, c1: Vec4, c2: Vec4, c3: Vec4): Mat4;
 
-export function mat4(...args: (number | Mat4 | Vec4)[]): Mat4 {
+export function mat4(...args: (number | AnyMatrix | Vec4)[]): Mat4 {
     const out: Mat4 = [
         [1, 0, 0, 0],
         [0, 1, 0, 0],
@@ -265,12 +301,22 @@ export function mat4(...args: (number | Mat4 | Vec4)[]): Mat4 {
     ] as Mat4;
     out.type = 'mat4';
 
-    if (args.length == 0) {
+    const argError = () => new Error(
+        "Invalid arguments passed to 'mat4':\n" +
+        "Expected either:\n" +
+        "    0 arguments,\n" +
+        "    16 numbers,\n" +
+        "    1 number,\n" +
+        "    1 matrix, or\n" +
+        "    4 vec4s;\n" +
+        `received: (${args.map(x => (x as any).type ?? typeof x).join(', ')})`
+    );
+
+    if (args.length === 0) {
         // Leave as identity
-    } else if (args.length == 16) {
+    } else if (args.length === 16) {
         for (const n of args) {
-            if (typeof n !== 'number')
-                throw new Error("Invalid arguments passed to 'mat4'. Expected 16 numbers.");
+            if (typeof n !== 'number') throw argError();
         }
 
         out[0][0] = (args as number[])[0];
@@ -292,20 +338,20 @@ export function mat4(...args: (number | Mat4 | Vec4)[]): Mat4 {
         out[3][1] = (args as number[])[13];
         out[3][2] = (args as number[])[14];
         out[3][3] = (args as number[])[15];
-    } else if (args.length == 4) {
+    } else if (args.length === 4) {
         const [c0, c1, c2, c3] = args;
 
         if (!isVector(c0) || !isVector(c1) || !isVector(c2) || !isVector(c3)) {
-            throw new Error("Invalid arguments passed to 'mat4'. Expected 4 column vectors.");
+            throw argError();
         } else if (c0.length != 4 || c1.length != 4 || c2.length != 4 || c3.length != 4) {
-            throw new Error("Invalid arguments passed to 'mat4'. Column vectors should be of size 4.");
+            throw argError();
         }
 
-        out[0] = [...c0] as Vec4;
-        out[1] = [...c1] as Vec4;
-        out[2] = [...c2] as Vec4;
-        out[3] = [...c3] as Vec4;
-    } else if (args.length == 1) {
+        out[0] = Array.from(c0) as Vec4;
+        out[1] = Array.from(c1) as Vec4;
+        out[2] = Array.from(c2) as Vec4;
+        out[3] = Array.from(c3) as Vec4;
+    } else if (args.length === 1) {
         const [m] = args;
 
         if (typeof m === 'number') {
@@ -313,17 +359,27 @@ export function mat4(...args: (number | Mat4 | Vec4)[]): Mat4 {
             out[1][1] = m;
             out[2][2] = m;
             out[3][3] = m;
-        } else if (isMatrix(m) && m.length == 4) {
-            // Copy columns
-            out[0] = [...m[0]];
-            out[1] = [...m[1]];
-            out[2] = [...m[2]];
-            out[3] = [...m[3]];
+        } else if (isMatrix(m)) {
+            if (m.type === 'mat4') {
+                out[0][0] = m[0][0]; out[0][1] = m[0][1]; out[0][2] = m[0][2]; out[0][3] = m[0][3];
+                out[1][0] = m[1][0]; out[1][1] = m[1][1]; out[1][2] = m[1][2]; out[1][3] = m[1][3];
+                out[2][0] = m[2][0]; out[2][1] = m[2][1]; out[2][2] = m[2][2]; out[2][3] = m[2][3];
+                out[3][0] = m[3][0]; out[3][1] = m[3][1]; out[3][2] = m[3][2]; out[3][3] = m[3][3];
+            } else if (m.type === 'mat3') {
+                out[0][0] = m[0][0]; out[0][1] = m[0][1]; out[0][2] = m[0][2];
+                out[1][0] = m[1][0]; out[1][1] = m[1][1]; out[1][2] = m[1][2];
+                out[2][0] = m[2][0]; out[2][1] = m[2][1]; out[2][2] = m[2][2];
+            } else if (m.type === 'mat2') {
+                out[0][0] = m[0][0]; out[0][1] = m[0][1];
+                out[1][0] = m[1][0]; out[1][1] = m[1][1];
+            } else {
+                throw argError();
+            }
         } else {
-            throw new Error("Invalid argument passed to 'mat2'. Expected a single scalar or a Mat2.");
+            throw argError();
         }
     } else {
-        throw new Error("Invalid arguments passed to 'mat4'. Expected 0 numbers, 16 numbers, 1 Mat4, or 4 Vec4s.");
+        throw argError();
     }
 
     return out;
