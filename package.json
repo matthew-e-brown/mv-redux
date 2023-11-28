@@ -1,7 +1,7 @@
 {
     "name": "mv-redux",
     "author": "Matthew Brown <matthew.e.brown.17@gmail.com>",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "license": "MIT",
     "description": "Matrix/vector library for WebGL, plus some helpers.",
     "type": "module",
