@@ -5,24 +5,24 @@
     "license": "MIT",
     "description": "Matrix/vector library for WebGL, plus some helpers.",
     "type": "module",
+    "scripts": {
+        "build": "tsc"
+    },
+    "devDependencies": {
+        "typescript": "^5.5.4"
+    },
     "files": [
         "./src",
         "./lib"
     ],
     "exports": {
-        "mv.js": {
-            "types": "./lib/types/mv.d.ts",
-            "import": "./lib/mv.js"
+        ".": {
+            "import": "./lib/index.js",
+            "types": "./lib/types/index.d.ts"
         },
-        "init-shaders.js": {
-            "types": "./lib/types/init-shaders.d.ts",
-            "import": "./lib/init-shaders.js"
+        "./init": {
+            "import": "./lib/init/index.js",
+            "types": "./lib/types/init/index.d.ts"
         }
-    },
-    "scripts": {
-        "build": "tsc"
-    },
-    "devDependencies": {
-        "typescript": "^5.2.2"
     }
 }

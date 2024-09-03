@@ -1,7 +1,7 @@
-export * from './mv/vec.js';
-export * from './mv/mat.js';
-export * from './mv/ops.js';
-export * from './mv/transforms.js';
+export * from './vec.js';
+export * from './mat.js';
+export * from './ops.js';
+export * from './transforms.js';
 
 // =================================================================================================
 // Helper functions
