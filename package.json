@@ -4,29 +4,35 @@
     "version": "0.1.6",
     "license": "MIT",
     "description": "Matrix/vector library for WebGL, plus some helpers.",
+    "files": [
+        "./src",
+        "./lib"
+    ],
     "type": "module",
+    "module": "./lib/index.js",
+    "types": "./lib/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./lib/index.js",
+            "types": "./lib/index.d.ts"
+        },
+        "./init": {
+            "import": "./lib/init/index.js",
+            "types": "./lib/init/index.d.ts"
+        },
+        "./helpers": {
+            "import": "./lib/helpers/index.js",
+            "types": "./lib/helpers/index.d.ts"
+        },
+        "./*": {
+            "import": "./lib/*.js",
+            "types": "./lib/*.d.ts"
+        }
+    },
     "scripts": {
         "build": "tsc"
     },
     "devDependencies": {
         "typescript": "^5.5.4"
-    },
-    "files": [
-        "./src",
-        "./lib"
-    ],
-    "exports": {
-        ".": {
-            "import": "./lib/index.js",
-            "types": "./lib/types/index.d.ts"
-        },
-        "./init": {
-            "import": "./lib/init/index.js",
-            "types": "./lib/types/init/index.d.ts"
-        },
-        "./helpers": {
-            "import": "./lib/helpers/index.js",
-            "types": "./lib/types/helpers/index.d.ts"
-        }
     }
 }

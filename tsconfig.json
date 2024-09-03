@@ -14,7 +14,6 @@
         "sourceMap": true,
         "declaration": true,
         "declarationMap": true,
-        "declarationDir": "./lib/types",
         "useDefineForClassFields": true, // we don't use any classes, but can't hurt
         // Linting
         // --------------------------------------
