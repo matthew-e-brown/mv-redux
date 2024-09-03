@@ -87,7 +87,7 @@ export interface CanvasOptions {
  *
  * @returns The WebGL 2 rendering context for the provided canvas.
  */
-export function initCanvas(canvas: HTMLCanvasElement, options?: CanvasOptions): WebGL2RenderingContext {
+export function initCanvas(canvas: HTMLCanvasElement | null, options?: CanvasOptions): WebGL2RenderingContext {
     if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
         window.alert("Failed to initialize canvas. Check the console for details.");
         console.error("Object %o is not a canvas.", canvas);
@@ -130,9 +130,11 @@ export function initCanvas(canvas: HTMLCanvasElement, options?: CanvasOptions): 
         function onDPIChange() {
             dpi = window.devicePixelRatio || 1;
 
-            canvas.width = baseWidth * dpi;
-            canvas.height = baseHeight * dpi;
-            options?.onResize?.(canvas.width, canvas.height);
+            // For some reason, TS can't see the `if !canvas` check we did earlier, so it thinks
+            // `canvas` might be null inside this function.
+            canvas!.width = baseWidth * dpi;
+            canvas!.height = baseHeight * dpi;
+            options?.onResize?.(canvas!.width, canvas!.height);
 
             // Re-add this function as a listener for the next time the display ratio changes.
             window
@@ -148,6 +150,7 @@ export function initCanvas(canvas: HTMLCanvasElement, options?: CanvasOptions): 
     }
 
     if (options?.fullscreen) {
+        canvas.classList.add('fullscreen');
         window.addEventListener('resize', throttle(() => {
             // DPI hasn't changed, but the window size has: re-scale the canvas's resolution.
             canvas.width = window.innerWidth * dpi;
