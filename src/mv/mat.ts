@@ -1,4 +1,4 @@
-import { isVector, isMatrix } from './index.js';
+import { isVector } from './vec.js';
 import type { Vec2, Vec3, Vec4 } from './vec.js';
 
 export type Mat2 = { type: 'mat2' } & [[number, number], [number, number]];
@@ -7,7 +7,16 @@ export type Mat4 = { type: 'mat4' } & [[number, number, number, number], [number
 
 export type AnyMatrix = Mat2 | Mat3 | Mat4;
 
-export { isMatrix } from './index.js';
+/**
+ * Determines whether or not the given object is a matrix.
+ */
+export function isMatrix(v: unknown): v is AnyMatrix {
+    return Array.isArray(v) && (
+        (v as AnyMatrix).type === 'mat4' ||
+        (v as AnyMatrix).type === 'mat3' ||
+        (v as AnyMatrix).type === 'mat2'
+    );
+}
 
 // =================================================================================================
 // Matrix constructors

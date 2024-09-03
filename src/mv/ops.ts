@@ -1,9 +1,20 @@
-import type { VectorWithSizeof } from './index.js';
-import type { AnyVector, Vec3 } from './vec.js';
-import type { AnyMatrix } from './mat.js';
+import type { AnyVector, Vec4, Vec3, Vec2 } from './vec.js';
+import type { AnyMatrix, Mat4, Mat3, Mat2 } from './mat.js';
 
 import { vec2, vec3, vec4, isVector } from './vec.js';
 import { mat2, mat3, mat4, isMatrix } from './mat.js';
+
+export type VectorWithSizeof<M extends AnyMatrix> =
+    M extends Mat4 ? Vec4 :
+    M extends Mat3 ? Vec3 :
+    M extends Mat2 ? Vec2 :
+    never;
+
+export type MatrixWithSizeof<V extends AnyVector> =
+    V extends Vec4 ? Mat4 :
+    V extends Vec3 ? Mat3 :
+    V extends Vec2 ? Mat2 :
+    never;
 
 
 // =================================================================================================

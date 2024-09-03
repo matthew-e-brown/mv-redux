@@ -21,8 +21,16 @@ export type Vec4 = [number, number, number, number] & {
 
 export type AnyVector = Vec2 | Vec3 | Vec4;
 
-// Re-export
-export { isVector } from './index.js';
+/**
+ * Determines whether or not the given object is a vector.
+ */
+export function isVector(v: unknown): v is AnyVector {
+    return Array.isArray(v) && (
+        (v as AnyVector).type === 'vec4' ||
+        (v as AnyVector).type === 'vec3' ||
+        (v as AnyVector).type === 'vec2'
+    );
+}
 
 // =================================================================================================
 // Vector constructors
