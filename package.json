@@ -23,6 +23,10 @@
         "./init": {
             "import": "./lib/init/index.js",
             "types": "./lib/types/init/index.d.ts"
+        },
+        "./helpers": {
+            "import": "./lib/helpers/index.js",
+            "types": "./lib/types/helpers/index.d.ts"
         }
     }
 }
