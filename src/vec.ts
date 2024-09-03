@@ -60,9 +60,7 @@ export function vec2(value: number): Vec2;
  * @param values Any combination of number, number array, or vector arguments. Values are copied
  * one-by-one from each until all this vector has both `x`, `y` components.
  *
- * ## Example
- *
- * ```js
+ * @example
  * const u = vec2(3, 2);
  * const v = vec3(9, 1, 7);
  * const w = [10, 11, 12, 13];
@@ -70,16 +68,14 @@ export function vec2(value: number): Vec2;
  * const a = vec2(u);   // -> vec2(3, 2)
  * const b = vec2(v);   // -> vec2(9, 1)
  * const c = vec2(w);   // -> vec2(10, 11)
- * ```
  */
 export function vec2(...values: (number | number[] | AnyVector)[]): Vec2
 
 export function vec2(...args: (number | number[] | AnyVector)[]): Vec2 {
-    const out = Object.defineProperties([0, 0], {
-        type: { value: 'vec2', writable: false, enumerable: false },
-        x: { get() { return this[0]; }, set(n: number) { this[0] = n; }, enumerable: false },
-        y: { get() { return this[1]; }, set(n: number) { this[1] = n; }, enumerable: false },
-    }) as Vec2;
+    const out = [0, 0];
+    Object.defineProperty(out, 'type', { value: 'vec2', writable: false, enumerable: false });
+    Object.defineProperty(out, 'x', { get() { return this[0]; }, set(n: number) { this[0] = n; }, enumerable: false });
+    Object.defineProperty(out, 'y', { get() { return this[1]; }, set(n: number) { this[1] = n; }, enumerable: false });
 
     const values = args.flat(1);
     for (let i = 0; i < values.length; i++) {
@@ -99,7 +95,7 @@ export function vec2(...args: (number | number[] | AnyVector)[]): Vec2 {
         throw new Error("Unreachable: array lengths must fall within range [0, INF).");
     }
 
-    return out;
+    return out as Vec2;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -129,9 +125,7 @@ export function vec3(value: number): Vec3;
  * @param values Any combination of number, number array, or vector arguments. Values are copied
  * one-by-one from each until all this vector has all `x`, `y`, and `z` components.
  *
- * ## Example
- *
- * ```js
+ * @example
  * const u = vec2(1, 2);
  * const v = vec2(8, 9);
  * const w = [-1, 3];
@@ -139,19 +133,17 @@ export function vec3(value: number): Vec3;
  * const a = vec3(u, v);    // -> vec3(1, 2, 8)
  * const b = vec3(6, u);    // -> vec3(6, 1, 2)
  * const c = vec3(1, w);    // -> vec3(1, -1, 3)
- * ```
  *
  * @throws An error will occur if fewer than 3 values are given across all arguments.
  */
 export function vec3(...values: (number | number[] | AnyVector)[]): Vec3;
 
 export function vec3(...args: (number | number[] | AnyVector)[]): Vec3 {
-    const out = Object.defineProperties([0, 0, 0], {
-        type: { value: 'vec3', writable: false, enumerable: false },
-        x: { get() { return this[0]; }, set(n: number) { this[0] = n; }, enumerable: false },
-        y: { get() { return this[1]; }, set(n: number) { this[1] = n; }, enumerable: false },
-        z: { get() { return this[2]; }, set(n: number) { this[2] = n; }, enumerable: false },
-    }) as Vec3;
+    const out = [0, 0, 0];
+    Object.defineProperty(out, 'type', { value: 'vec3', writable: false, enumerable: false });
+    Object.defineProperty(out, 'x', { get() { return this[0]; }, set(n: number) { this[0] = n; }, enumerable: false });
+    Object.defineProperty(out, 'y', { get() { return this[1]; }, set(n: number) { this[1] = n; }, enumerable: false });
+    Object.defineProperty(out, 'z', { get() { return this[2]; }, set(n: number) { this[2] = n; }, enumerable: false });
 
     const values = args.flat(1);
     for (let i = 0; i < values.length; i++) {
@@ -176,7 +168,7 @@ export function vec3(...args: (number | number[] | AnyVector)[]): Vec3 {
         );
     }
 
-    return out;
+    return out as Vec3;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -207,9 +199,7 @@ export function vec4(value: number): Vec4;
  * @param values Any combination of number, number array, or vector arguments. Values are copied
  * one-by-one from each until all this vector has all `x`, `y`, `z`, and `w` components.
  *
- * ## Example
- *
- * ```js
+ * @example
  * const u = vec2(2, 1);
  * const v = [-1, 3];
  * const w = vec3(8, 7, 9);
@@ -218,20 +208,18 @@ export function vec4(value: number): Vec4;
  * const c = vec4(w, 1);    // -> vec4(8, 7, 9, 1)
  * const c = vec4(w, u);    // -> vec4(8, 7, 9, 2)
  * const b = vec4(6, v);    // -> Error: too few values passed
- * ```
  *
  * @throws An error will occur if fewer than 4 values are given across all arguments.
  */
 export function vec4(...values: (number | number[] | AnyVector)[]): Vec4;
 
 export function vec4(...args: (number | number[] | AnyVector)[]): Vec4 {
-    const out = Object.defineProperties([0, 0, 0, 0], {
-        type: { value: 'vec4', writable: false, enumerable: false, },
-        x: { get() { return this[0]; }, set(n: number) { this[0] = n; }, enumerable: false },
-        y: { get() { return this[1]; }, set(n: number) { this[1] = n; }, enumerable: false },
-        z: { get() { return this[2]; }, set(n: number) { this[2] = n; }, enumerable: false },
-        w: { get() { return this[3]; }, set(n: number) { this[3] = n; }, enumerable: false },
-    }) as Vec4;
+    const out = [0, 0, 0, 0];
+    Object.defineProperty(out, 'type', { value: 'vec4', writable: false, enumerable: false });
+    Object.defineProperty(out, 'x', { get() { return this[0]; }, set(n: number) { this[0] = n; }, enumerable: false });
+    Object.defineProperty(out, 'y', { get() { return this[1]; }, set(n: number) { this[1] = n; }, enumerable: false });
+    Object.defineProperty(out, 'z', { get() { return this[2]; }, set(n: number) { this[2] = n; }, enumerable: false });
+    Object.defineProperty(out, 'w', { get() { return this[3]; }, set(n: number) { this[3] = n; }, enumerable: false });
 
     const values = args.flat(1);
     for (let i = 0; i < values.length; i++) {
@@ -258,5 +246,5 @@ export function vec4(...args: (number | number[] | AnyVector)[]): Vec4 {
         );
     }
 
-    return out;
+    return out as Vec4;
 }
