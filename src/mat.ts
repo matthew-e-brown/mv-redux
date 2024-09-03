@@ -1,9 +1,18 @@
 import { isVector } from './vec.js';
 import type { Vec2, Vec3, Vec4 } from './vec.js';
 
-export type Mat2 = { type: 'mat2' } & [[number, number], [number, number]];
-export type Mat3 = { type: 'mat3' } & [[number, number, number], [number, number, number], [number, number, number]];
-export type Mat4 = { type: 'mat4' } & [[number, number, number, number], [number, number, number, number], [number, number, number, number], [number, number, number, number]];
+export type Mat2 = [[number, number], [number, number]] & {
+    type: 'mat2'
+};
+
+export type Mat3 = [[number, number, number], [number, number, number], [number, number, number]] & {
+    type: 'mat3'
+};
+
+export type Mat4 = [[number, number, number, number], [number, number, number, number], [number, number, number, number], [number, number, number, number]] & {
+    type: 'mat4'
+};
+
 
 export type AnyMatrix = Mat2 | Mat3 | Mat4;
 
@@ -61,11 +70,12 @@ export function mat2(mat: AnyMatrix): Mat2;
 export function mat2(c0: Vec2, c1: Vec2): Mat2;
 
 export function mat2(...args: (number | AnyMatrix | Vec2)[]): Mat2 {
-    const out: Mat2 = [
+    const out = Object.defineProperties([
         [1, 0],
         [0, 1],
-    ] as Mat2;
-    out.type = 'mat2';
+    ], {
+        type: { value: 'mat2', writable: false, enumerable: false },
+    }) as Mat2;
 
     const argError = () => new Error(
         "Invalid arguments passed to 'mat2':\n" +
@@ -81,8 +91,8 @@ export function mat2(...args: (number | AnyMatrix | Vec2)[]): Mat2 {
     if (args.length == 0) {
         // Leave as identity
     } else if (args.length == 4) {
-        for (const n of args) {
-            if (typeof n !== 'number')
+        for (let i = 0; i < 4; i++) {
+            if (typeof args[i] !== 'number')
                 throw argError();
         }
 
@@ -100,8 +110,8 @@ export function mat2(...args: (number | AnyMatrix | Vec2)[]): Mat2 {
             throw argError();
         }
 
-        out[0] = Array.from(c0) as Vec2;
-        out[1] = Array.from(c1) as Vec2;
+        out[0] = Array.from(c0) as [number, number];
+        out[1] = Array.from(c1) as [number, number];
     } else if (args.length == 1) {
         const [m] = args;
 
@@ -169,12 +179,13 @@ export function mat3(mat: AnyMatrix): Mat3;
 export function mat3(c0: Vec3, c1: Vec3, c2: Vec3): Mat3;
 
 export function mat3(...args: (number | AnyMatrix | Vec3)[]): Mat3 {
-    const out: Mat3 = [
+    const out = Object.defineProperties([
         [1, 0, 0],
         [0, 1, 0],
         [0, 0, 1],
-    ] as Mat3;
-    out.type = 'mat3';
+    ], {
+        type: { value: 'mat3', writable: false, enumerable: false },
+    }) as Mat3;
 
     const argError = () => new Error(
         "Invalid arguments passed to 'mat3':\n" +
@@ -190,8 +201,9 @@ export function mat3(...args: (number | AnyMatrix | Vec3)[]): Mat3 {
     if (args.length == 0) {
         // Leave as identity
     } else if (args.length == 9) {
-        for (const n of args) {
-            if (typeof n !== 'number') throw argError();
+        for (let i = 0; i < 9; i++) {
+            if (typeof args[i] !== 'number')
+                throw argError();
         }
 
         out[0][0] = (args as number[])[0];
@@ -214,9 +226,9 @@ export function mat3(...args: (number | AnyMatrix | Vec3)[]): Mat3 {
             throw argError();
         }
 
-        out[0] = Array.from(c0) as Vec3;
-        out[1] = Array.from(c1) as Vec3;
-        out[2] = Array.from(c2) as Vec3;
+        out[0] = Array.from(c0) as [number, number, number];
+        out[1] = Array.from(c1) as [number, number, number];
+        out[2] = Array.from(c2) as [number, number, number];
     } else if (args.length == 1) {
         const [m] = args;
 
@@ -300,13 +312,14 @@ export function mat4(mat: AnyMatrix): Mat4;
 export function mat4(c0: Vec4, c1: Vec4, c2: Vec4, c3: Vec4): Mat4;
 
 export function mat4(...args: (number | AnyMatrix | Vec4)[]): Mat4 {
-    const out: Mat4 = [
+    const out = Object.defineProperties([
         [1, 0, 0, 0],
         [0, 1, 0, 0],
         [0, 0, 1, 0],
         [0, 0, 0, 1],
-    ] as Mat4;
-    out.type = 'mat4';
+    ], {
+        type: { value: 'mat4', writable: false, enumerable: false },
+    }) as Mat4;
 
     const argError = () => new Error(
         "Invalid arguments passed to 'mat4':\n" +
@@ -322,8 +335,9 @@ export function mat4(...args: (number | AnyMatrix | Vec4)[]): Mat4 {
     if (args.length === 0) {
         // Leave as identity
     } else if (args.length === 16) {
-        for (const n of args) {
-            if (typeof n !== 'number') throw argError();
+        for (let i = 0; i < 16; i++) {
+            if (typeof args[i] !== 'number')
+                throw argError();
         }
 
         out[0][0] = (args as number[])[0];
@@ -354,10 +368,10 @@ export function mat4(...args: (number | AnyMatrix | Vec4)[]): Mat4 {
             throw argError();
         }
 
-        out[0] = Array.from(c0) as Vec4;
-        out[1] = Array.from(c1) as Vec4;
-        out[2] = Array.from(c2) as Vec4;
-        out[3] = Array.from(c3) as Vec4;
+        out[0] = Array.from(c0) as [number, number, number, number];
+        out[1] = Array.from(c1) as [number, number, number, number];
+        out[2] = Array.from(c2) as [number, number, number, number];
+        out[3] = Array.from(c3) as [number, number, number, number];
     } else if (args.length === 1) {
         const [m] = args;
 

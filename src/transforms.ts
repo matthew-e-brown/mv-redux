@@ -360,8 +360,8 @@ export function normalMatrix(m: Mat3 | Mat4, asMat3 = false): Mat4 | Mat3 {
 /**
  * Creates a translation matrix.
  *
- * @deprecated This function has been replaced with {@link translationMatrix}, which accepts more
- * versatile inputs.
+ * @deprecated This function has been replaced with {@linkcode translationMatrix}, which accepts
+ * more versatile inputs.
  */
 export function translate(x: number, y: number, z: number): Mat4 {
     return translationMatrix(x, y, z);
@@ -370,16 +370,18 @@ export function translate(x: number, y: number, z: number): Mat4 {
 /**
  * Creates an axis-angle rotation matrix.
  *
- * @deprecated This function, as well as {@link rotateX}, {@link rotateY}, and {@link rotateZ}, have
- * all been replaced by {@link rotationMatrix}, which handles all rotation matrices.
+ * @deprecated This function, as well as {@linkcode rotateX}, {@linkcode rotateY}, and
+ * {@linkcode rotateZ}, have all been replaced by {@linkcode rotationMatrix}, which handles all
+ * rotation matrices.
  */
 export function rotate(angle: number, axis: [number, number, number]): Mat4;
 
 /**
  * Creates an axis-angle rotation matrix.
  *
- * @deprecated This function, as well as {@link rotateX}, {@link rotateY}, and {@link rotateZ}, have
- * all been replaced by {@link rotationMatrix}, which handles all rotation matrices.
+ * @deprecated This function, as well as {@linkcode rotateX}, {@linkcode rotateY}, and
+ * {@linkcode rotateZ}, have all been replaced by {@linkcode rotationMatrix}, which handles all
+ * rotation matrices.
  */
 export function rotate(angle: number, axisX: number, axisY: number, axisZ: number): Mat4;
 
@@ -400,7 +402,7 @@ export function rotate(...args: (number | number[])[]): Mat4 {
 /**
  * Constructs a rotation matrix that will rotate things around the X-axis.
  *
- * @deprecated This function has been replaced with {@link rotationMatrix}, which accepts more
+ * @deprecated This function has been replaced with {@linkcode rotationMatrix}, which accepts more
  * versatile inputs.
  */
 export function rotateX(theta: number): Mat4 {
@@ -410,7 +412,7 @@ export function rotateX(theta: number): Mat4 {
 /**
  * Constructs a rotation matrix that will rotate things around the Y-axis.
  *
- * @deprecated This function has been replaced with {@link rotationMatrix}, which accepts more
+ * @deprecated This function has been replaced with {@linkcode rotationMatrix}, which accepts more
  * versatile inputs.
  */
 export function rotateY(theta: number): Mat4 {
@@ -420,7 +422,7 @@ export function rotateY(theta: number): Mat4 {
 /**
  * Constructs a rotation matrix that will rotate things around the Z-axis.
  *
- * @deprecated This function has been replaced with {@link rotationMatrix}, which accepts more
+ * @deprecated This function has been replaced with {@linkcode rotationMatrix}, which accepts more
  * versatile inputs.
  */
 export function rotateZ(theta: number): Mat4 {
@@ -430,7 +432,7 @@ export function rotateZ(theta: number): Mat4 {
 /**
  * Constructs a scale matrix.
  *
- * @deprecated This function has been replaced with {@link scaleMatrix}, which accepts more
+ * @deprecated This function has been replaced with {@linkcode scaleMatrix}, which accepts more
  * versatile inputs.
  */
 export function scale(x: number, y: number, z: number) {
@@ -438,24 +440,24 @@ export function scale(x: number, y: number, z: number) {
 }
 
 /**
- * @deprecated This function has been renamed to {@link lookAtMatrix} for consistency with the other
- * transformation matrix functions.
+ * @deprecated This function has been renamed to {@linkcode lookAtMatrix} for consistency with the
+ * other transformation matrix functions.
  */
 export function lookAt(eye: Vec3, at: Vec3, up: Vec3): Mat4 {
     return lookAtMatrix(eye, at, up ?? null);
 }
 
 /**
- * @deprecated This function has been renamed to {@link orthographicMatrix} for consistency with the
- * other transformation matrix functions.
+ * @deprecated This function has been renamed to {@linkcode orthographicMatrix} for consistency with
+ * the other transformation matrix functions.
  */
 export function ortho(left: number, right: number, bottom: number, top: number, near: number, far: number): Mat4 {
     return orthographicMatrix(left, right, bottom, top, near, far);
 }
 
 /**
- * @deprecated This function has been renamed to {@link perspectiveMatrix} for consistency with the
- * other transformation matrix functions.
+ * @deprecated This function has been renamed to {@linkcode perspectiveMatrix} for consistency with
+ * the other transformation matrix functions.
  */
 export function perspective(fovY: number, aspect: number, near: number, far: number) {
     return perspectiveMatrix(fovY, aspect, near, far);

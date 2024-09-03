@@ -82,8 +82,9 @@ export function vec2(...args: (number | number[] | AnyVector)[]): Vec2 {
     }) as Vec2;
 
     const values = args.flat(1);
-    if (!values.every(n => typeof n === 'number')) {
-        throw new Error("Invalid arguments passed to 'vec2'. Expected all numbers.");
+    for (let i = 0; i < values.length; i++) {
+        if (typeof values[i] !== 'number')
+            throw new Error("Invalid arguments passed to 'vec2'. Expected all numbers.");
     }
 
     if (args.length == 0) {
@@ -153,8 +154,9 @@ export function vec3(...args: (number | number[] | AnyVector)[]): Vec3 {
     }) as Vec3;
 
     const values = args.flat(1);
-    if (!values.every(n => typeof n === 'number')) {
-        throw new Error("Invalid arguments passed to 'vec3'. Expected all numbers.");
+    for (let i = 0; i < values.length; i++) {
+        if (typeof values[i] !== 'number')
+            throw new Error("Invalid arguments passed to 'vec2'. Expected all numbers.");
     }
 
     if (args.length == 0) {
@@ -232,8 +234,9 @@ export function vec4(...args: (number | number[] | AnyVector)[]): Vec4 {
     }) as Vec4;
 
     const values = args.flat(1);
-    if (!values.every(n => typeof n === 'number')) {
-        throw new Error("Invalid arguments passed to 'vec4'. Expected all numbers.");
+    for (let i = 0; i < values.length; i++) {
+        if (typeof values[i] !== 'number')
+            throw new Error("Invalid arguments passed to 'vec2'. Expected all numbers.");
     }
 
     if (values.length == 0) {

@@ -49,9 +49,16 @@ export function equal<T extends AnyVector | AnyMatrix>(u: T, v: T): boolean {
 
 // -------------------------------------------------------------------------------------------------
 
-/** 180 over π, the number to multiply by to convert an angle from radians to degrees. */
+/**
+ * 180 over π. Multiplying an angle represented in radians by this number will convert it to
+ * degrees.
+ */
 export const RADIANS_TO_DEGREES = 180 / Math.PI;
-/** π over 180, the number to multiply by to convert an angle from degrees to radians. */
+
+/**
+ * π over 180. Multiplying an angle represented in degrees by this number will convert it to
+ * radians.
+ */
 export const DEGREES_TO_RADIANS = Math.PI / 180;
 
 
@@ -239,7 +246,7 @@ export function sub(u: AnyVector | AnyMatrix, v: AnyVector | AnyMatrix): AnyVect
 
 /**
  * Computes the difference of two vectors or two matrices.
- * @deprecated This function has been renamed to {@link sub `sub`}.
+ * @deprecated This function has been renamed to {@linkcode sub}.
  */
 export function subtract<T extends AnyVector | AnyMatrix>(u: T, v: T): T {
     return sub(u as any, v as any) as T;
@@ -279,7 +286,7 @@ export function mult<T extends AnyVector | AnyMatrix>(scalar: number, u: T): T;
 /**
  * Computes the matrix product between a matrix and vector.
  * @param m The left-hand operand.
- * @param v The right-hand operand. Must be the same size as the matrix provided for {@link m `m`}.
+ * @param v The right-hand operand. Must be the same size as the matrix provided for {@linkcode m}.
  * @throws An error will occur when attempting to multiply two non-matrix or non-vector types (aside
  * from a matrix or vector with a number), or two matrix/vector types of different size.
  */
@@ -292,8 +299,8 @@ export function mult<M extends AnyMatrix, V extends VectorWithSizeof<M>>(m: M, v
  * @param u
  * @param v
  *
- * @see {@link dot `dot`} For the dot product of two vectors.
- * @see {@link cross `cross`} For the cross product of two vectors.
+ * @see {@linkcode dot} For the dot product of two vectors.
+ * @see {@linkcode cross} For the cross product of two vectors.
  *
  * @throws An error will occur when attempting to multiply two non-matrix or non-vector types (aside
  * from a matrix or vector with a number), or two matrix/vector types of different size.
@@ -504,9 +511,14 @@ export function cross(u: Vec3, v: Vec3): Vec3 {
  * Computes the magnitude of a vector.
  */
 export function magnitude(v: AnyVector): number {
-    /** @todo: inline this call to dot to avoid successive type-checking */
-    if (isVector(v))
-        return Math.sqrt(dot(v, v));
+    if (isVector(v)) {
+        // Inlined call to `dot(v, v)`:
+        switch (v.type) {
+            case 'vec4': return Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3]);
+            case 'vec3': return Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+            case 'vec2': return Math.sqrt(v[0] * v[0] + v[1] * v[1]);
+        }
+    }
 
     const vType: string = (v as any)?.type ?? typeof v;
     throw new Error(`Invalid argument passed to 'magnitude':\nExpected a vector, received ${vType}.`);
@@ -515,7 +527,7 @@ export function magnitude(v: AnyVector): number {
 /**
  * Computes the length (magnitude) of a vector.
  *
- * This function is an alias for {@link magnitude `magnitude`}.
+ * This function is an alias for {@linkcode magnitude}.
  */
 export function length(v: AnyVector): number {
     return magnitude(v);
@@ -525,9 +537,21 @@ export function length(v: AnyVector): number {
  * Computes a normalized version of the given vector.
  */
 export function normalize<T extends AnyVector>(v: T): T {
-    /** @todo: inline these calls to magnitude and mult to avoid successive type-checking */
-    if (isVector(v))
-        return mult(v, 1 / magnitude(v));
+    if (isVector(v)) {
+        // Inlined calls to `magnitude` and `mult`, plus a check for zero magnitude
+        let m: number;
+        switch (v.type) {
+            case 'vec4':
+                m = v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3];
+                return ((m == 0) ? vec4(0) : vec4(v[0] / m, v[1] / m, v[2] / m, v[3] / m)) as T;
+            case 'vec3':
+                m = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
+                return ((m == 0) ? vec3(0) : vec3(v[0] / m, v[1] / m, v[2] / m)) as T;
+            case 'vec2':
+                m = v[0] * v[0] + v[1] * v[1];
+                return ((m == 0) ? vec2(0) : vec2(v[0] / m, v[1] / m)) as T;
+        }
+    }
 
     const vType: string = (v as any)?.type ?? typeof v;
     throw new Error(`Invalid argument passed to 'normalize':\nExpected a vector, received ${vType}.`);
