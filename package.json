@@ -4,6 +4,10 @@
     "version": "0.1.6",
     "license": "MIT",
     "description": "Matrix/vector library for WebGL, plus some helpers.",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/matthew-e-brown/mv-redux.git"
+    },
     "files": [
         "./src",
         "./lib"
