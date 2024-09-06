@@ -30,7 +30,7 @@ export function compileShader(
     shaderType: GLenum,
     shaderSrc: string,
 ): WebGLShader {
-    let typeName; // Used for printing errors
+    let typeName: string; // Used for printing errors
     switch (shaderType) {
         case gl.VERTEX_SHADER: typeName = 'vertex'; break;
         case gl.FRAGMENT_SHADER: typeName = 'fragment'; break;
