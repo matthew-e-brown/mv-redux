@@ -57,28 +57,28 @@ export function translationMatrix(
 /**
  * Constructs a transformation matrix that will rotate points around the given axis by some angle.
  * @param axis Which axis to rotate around.
- * @param angle How far (**in degrees**) to rotate around the axis.
+ * @param radians How far to rotate around the axis.
  */
-export function rotationMatrix(axis: 'x' | 'y' | 'z', angle: number): Mat4;
+export function rotationMatrix(axis: 'x' | 'y' | 'z', radians: number): Mat4;
 
 /**
  * Constructs a transformation matrix that will rotate points around an arbitrary axis.
  * @param axis A unit-vector that describes the direction of the axis to rotate around.
- * @param angle How far (**in degrees**) to rotate around the axis.
+ * @param radians How far to rotate around the axis.
  */
-export function rotationMatrix(axis: Vec3, angle: number): Mat4;
+export function rotationMatrix(axis: Vec3, radians: number): Mat4;
 
-export function rotationMatrix(axis: 'x' | 'y' | 'z' | Vec3, angle: number): Mat4 {
-    if (typeof angle !== 'number') {
-        const thetaType = (angle as any)?.type ?? typeof angle;
+export function rotationMatrix(axis: 'x' | 'y' | 'z' | Vec3, radians: number): Mat4 {
+    if (typeof radians !== 'number') {
+        const thetaType = (radians as any)?.type ?? typeof radians;
         throw new Error(
             "Invalid argument passed to 'rotationMatrix':\n" +
             `Expected 'theta' to be a number, received (${thetaType}).`
         );
     }
 
-    const sin = Math.sin(radians(angle));
-    const cos = Math.cos(radians(angle));
+    const sin = Math.sin(radians);
+    const cos = Math.cos(radians);
 
     if (typeof axis === 'string') {
         switch (axis.toLowerCase()) {
@@ -115,7 +115,7 @@ export function rotationMatrix(axis: 'x' | 'y' | 'z' | Vec3, angle: number): Mat
     }
 
     const axisType: string = (axis as any)?.type ?? typeof axis;
-    const angleType: string = (angle as any)?.type ?? typeof angle;
+    const angleType: string = (radians as any)?.type ?? typeof radians;
     throw new Error(
         "Invalid arguments passed to 'rotationMatrix':\n" +
         `Expected an axis ('x', 'y', 'z', or a vec3) and an angle; received (${axisType}, ${angleType}).`
@@ -225,7 +225,7 @@ export function lookAtMatrix(eyePosition: Vec3, target: Vec3, upVec: Vec3 = vec3
 
 /**
  * Constructs a _perspective projection matrix._
- * @param fovY The desired **vertical** field-of-view (**in degrees**).
+ * @param fovY The desired **vertical** field-of-view (**in radians**).
  * @param aspectRatio The screen's aspect ratio (width over height).
  * @param near The near clipping-plane's distance from the camera. Anything closer than this
  * distance will be cut off.
@@ -251,7 +251,7 @@ export function perspectiveMatrix(fovY: number, aspectRatio: number, near: numbe
         );
     }
 
-    const fov = Math.tan(radians(fovY / 2));
+    const fov = Math.tan(fovY / 2);
     const a = aspectRatio;
     const n = near;
     const f = far;
@@ -373,7 +373,7 @@ export function translate(x: number, y: number, z: number): Mat4 {
  * {@linkcode rotateZ}, have all been replaced by {@linkcode rotationMatrix}, which handles all
  * rotation matrices.
  */
-export function rotate(angle: number, axis: [number, number, number]): Mat4;
+export function rotate(degrees: number, axis: [number, number, number]): Mat4;
 
 /**
  * Creates an axis-angle rotation matrix.
@@ -382,15 +382,15 @@ export function rotate(angle: number, axis: [number, number, number]): Mat4;
  * {@linkcode rotateZ}, have all been replaced by {@linkcode rotationMatrix}, which handles all
  * rotation matrices.
  */
-export function rotate(angle: number, axisX: number, axisY: number, axisZ: number): Mat4;
+export function rotate(degrees: number, axisX: number, axisY: number, axisZ: number): Mat4;
 
 export function rotate(...args: (number | number[])[]): Mat4 {
     if (args.length === 2) {
         // We let this function do the error checking. Note that the old version takes angle first.
-        return rotationMatrix(args[1] as Vec3, args[0] as number);
+        return rotationMatrix(args[1] as Vec3, radians(args[0] as number));
     } else if (args.length === 4) {
         const axis = vec3(args[1], args[2], args[3]);
-        return rotationMatrix(axis, args[0] as number);
+        return rotationMatrix(axis, radians(args[0] as number));
     } else {
         // @ts-ignore We just toss all their arguments into the main function and let it do
         // error-handling.
@@ -404,8 +404,8 @@ export function rotate(...args: (number | number[])[]): Mat4 {
  * @deprecated This function has been replaced with {@linkcode rotationMatrix}, which accepts more
  * versatile inputs.
  */
-export function rotateX(theta: number): Mat4 {
-    return rotationMatrix('x', theta);
+export function rotateX(degrees: number): Mat4 {
+    return rotationMatrix('x', radians(degrees));
 }
 
 /**
@@ -414,8 +414,8 @@ export function rotateX(theta: number): Mat4 {
  * @deprecated This function has been replaced with {@linkcode rotationMatrix}, which accepts more
  * versatile inputs.
  */
-export function rotateY(theta: number): Mat4 {
-    return rotationMatrix('y', theta);
+export function rotateY(degrees: number): Mat4 {
+    return rotationMatrix('y', radians(degrees));
 }
 
 /**
@@ -424,8 +424,8 @@ export function rotateY(theta: number): Mat4 {
  * @deprecated This function has been replaced with {@linkcode rotationMatrix}, which accepts more
  * versatile inputs.
  */
-export function rotateZ(theta: number): Mat4 {
-    return rotationMatrix('z', theta);
+export function rotateZ(degrees: number): Mat4 {
+    return rotationMatrix('z', radians(degrees));
 }
 
 /**
