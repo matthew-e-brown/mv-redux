@@ -255,11 +255,9 @@ export function subtract<T extends AnyVector | AnyMatrix>(u: T, v: T): T {
 // -------------------------------------------------------------------------------------------------
 
 /**
- * Computes the matrix product of two matrices.
- * @param a The left-hand operand.
- * @param b The right-hand operand.
- * @note Don't forget that matrices are stored in column-major order, which can affect the order
- * that operands need to be written.
+ * Computes the product of two matrices.
+ * @param a The left-hand matrix.
+ * @param b The right-hand matrix.
  * @throws An error will occur when attempting to multiply two non-matrix or non-vector types (aside
  * from a matrix or vector with a number), or two matrix/vector types of different size.
  */
@@ -284,20 +282,33 @@ export function mult<T extends AnyVector | AnyMatrix>(u: T, scalar: number): T;
 export function mult<T extends AnyVector | AnyMatrix>(scalar: number, u: T): T;
 
 /**
- * Computes the matrix product between a matrix and vector.
- * @param m The left-hand operand.
- * @param v The right-hand operand. Must be the same size as the matrix provided for {@linkcode m}.
+ * Computes the matrix product between a matrix and an `n × 1` column-vector.
+ * @note This order of operands (matrix, vector) follows the OpenGL/WebGL convention of using
+ * column-vectors instead of row-vectors.
+ * @param m The matrix.
+ * @param v The vector.
  * @throws An error will occur when attempting to multiply two non-matrix or non-vector types (aside
  * from a matrix or vector with a number), or two matrix/vector types of different size.
  */
 export function mult<M extends AnyMatrix, V extends VectorWithSizeof<M>>(m: M, v: V): V;
 
 /**
+ * Computes the matrix product between a `1 × n` row-vector and a matrix.
+ * @note The OpenGL/WebGL convention is to use column-vectors (`n × 1`) instead of row-vectors.
+ * **Are you sure your arguments are in the right order?**
+ * @param v The vector.
+ * @param m The matrix.
+ * @throws An error will occur when attempting to multiply two non-matrix or non-vector types (aside
+ * from a matrix or vector with a number), or two matrix/vector types of different size.
+ */
+export function mult<V extends AnyVector, M extends MatrixWithSizeof<V>>(v: V, m: M): V;
+
+/**
  * Computes the element-wise product of two vectors, also known as the
  * {@link https://en.wikipedia.org/wiki/Hadamard_product_%28matrices%29 _Hadamard product_}.
  *
- * @param u
- * @param v
+ * @param u The left-hand vector.
+ * @param v The right-hand vector.
  *
  * @see {@linkcode dot} For the dot product of two vectors.
  * @see {@linkcode cross} For the cross product of two vectors.
@@ -436,20 +447,49 @@ export function mult(u: AnyVector | AnyMatrix | number, v: AnyVector | AnyMatrix
             return vec2(u[0] * v[0], u[1] * v[1]);
     }
 
+    else if (isVector(u) && isMatrix(v)) {
+        // Allow for row-vector * matrix if they want it, since OpenGL _does_ also have an overload
+        // for it...
+        if (u.type === 'vec4' && v.type === 'mat4') {
+            return vec4(
+                (u[0] * v[0][0]) + (u[1] * v[0][1]) + (u[2] * v[0][2]) + (u[3] * v[0][3]),
+                (u[0] * v[1][0]) + (u[1] * v[1][1]) + (u[2] * v[1][2]) + (u[3] * v[1][3]),
+                (u[0] * v[2][0]) + (u[1] * v[2][1]) + (u[2] * v[2][2]) + (u[3] * v[2][3]),
+                (u[0] * v[3][0]) + (u[1] * v[3][1]) + (u[2] * v[3][2]) + (u[3] * v[3][3]),
+            );
+        }
+
+        else if (u.type === 'vec3' && v.type === 'mat3') {
+            return vec3(
+                (u[0] * v[0][0]) + (u[1] * v[0][1]) + (u[2] * v[0][2]),
+                (u[0] * v[1][0]) + (u[1] * v[1][1]) + (u[2] * v[1][2]),
+                (u[0] * v[2][0]) + (u[1] * v[2][1]) + (u[2] * v[2][2]),
+            );
+        }
+
+        else if (u.type === 'vec2' && v.type === 'mat2') {
+            return vec2(
+                (u[0] * v[0][0]) + (u[1] * v[0][1]),
+                (u[0] * v[1][0]) + (u[1] * v[1][1]),
+            );
+        }
+    }
+
     const uType: string = (u as any)?.type ?? typeof u;
     const vType: string = (v as any)?.type ?? typeof v;
     const msg = "Invalid arguments passed to 'mult':\n";
 
-    if (uType.startsWith('vec') && vType.startsWith('mat'))
-        throw new Error(msg + `Received (${uType} * ${vType}); matrix must be the left-hand operand.`);
-    else if (uType.startsWith('mat') && vType.startsWith('vec'))
+    if (
+        (uType.startsWith('mat') && vType.startsWith('vec')) ||
+        (uType.startsWith('vec') && vType.startsWith('mat'))
+    )
         throw new Error(msg + `Received (${uType} * ${vType}); matrix and vector operands must be the same size.`);
 
     else
         throw new Error(msg + "Expected one of:\n" +
-            "    (Matrix * Matrix) or (Matrix * Vector),\n" +
-            "    (scalar * Matrix) or (Matrix * scalar), (scalar * Vector) or (Vector * scalar),\n" +
-            "    or (Vector * Vector);\n" +
+            "    (Matrix * Matrix), (Matrix * Vector), (Vector * Matrix),\n" +
+            "    (scalar * Matrix), (Matrix * scalar), (scalar * Vector), (Vector * scalar), or\n" +
+            "    (Vector * Vector);\n" +
             `received (${uType} * ${vType}).`
         );
 }
