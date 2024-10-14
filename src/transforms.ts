@@ -190,25 +190,25 @@ export function lookAtMatrix(eyePosition: Vec3, target: Vec3, upVec: Vec3 = vec3
         isVector(upVec) && upVec.type === 'vec3'
     ) {
         // Compute the new axes that our camera's coordinate space contains
-        const zAxis = normalize(sub(target, eyePosition));
-        const xAxis = normalize(cross(zAxis, upVec));
-        const yAxis = cross(xAxis, zAxis); // norm × norm = norm
+        const d = normalize(sub(target, eyePosition)); // Direction vector
+        const r = normalize(cross(d, upVec)); // Right vector
+        const u = cross(r, d); // Up vector (already normalized, norm × norm = norm).
 
         // Negate Z to go from left-handed to right-handed coordinate system
-        zAxis[0] = -zAxis[0];
-        zAxis[1] = -zAxis[1];
-        zAxis[2] = -zAxis[2];
+        d[0] = -d[0];
+        d[1] = -d[1];
+        d[2] = -d[2];
 
         // Figure out how far away to move everything else
-        const xTrans = -dot(xAxis, eyePosition);
-        const zTrans = -dot(zAxis, eyePosition);
-        const yTrans = -dot(yAxis, eyePosition);
+        const x = -dot(r, eyePosition);
+        const y = -dot(u, eyePosition);
+        const z = -dot(d, eyePosition);
 
         return mat4(
-            xAxis[0], yAxis[0], zAxis[0], 0,
-            xAxis[1], yAxis[1], zAxis[1], 0,
-            xAxis[2], yAxis[2], zAxis[2], 0,
-            xTrans, yTrans, zTrans, 1,
+            r[0], u[0], d[0], 0,
+            r[1], u[1], d[1], 0,
+            r[2], u[2], d[2], 0,
+            x, y, z, 1,
         );
     }
 
@@ -225,8 +225,8 @@ export function lookAtMatrix(eyePosition: Vec3, target: Vec3, upVec: Vec3 = vec3
 
 /**
  * Constructs a _perspective projection matrix._
- * @param fovY The desired **vertical** field-of-view.
- * @param aspectRatio The ratio of the screen's width to its height.
+ * @param fovY The desired **vertical** field-of-view (**in degrees**).
+ * @param aspectRatio The screen's aspect ratio (width over height).
  * @param near The near clipping-plane's distance from the camera. Anything closer than this
  * distance will be cut off.
  * @param far The far clipping-plane's distance from the camera. Anything further than this distance
@@ -251,18 +251,17 @@ export function perspectiveMatrix(fovY: number, aspectRatio: number, near: numbe
         );
     }
 
-    const fov = 1 / Math.tan(radians(fovY) / 2);
-    const depth = far - near;
+    const fov = Math.tan(radians(fovY / 2));
+    const a = aspectRatio;
+    const n = near;
+    const f = far;
 
-    const result = mat4();
-    result[0][0] = fov / aspectRatio;
-    result[1][1] = fov;
-    result[2][2] = -(near + far) / depth;
-    result[2][3] = -2 * near * far / depth;
-    result[3][2] = -1;
-    result[3][3] = 0;
-
-    return result;
+    return mat4(
+        1.0 / (a * fov), 0.0,       0.0,                      0.0,
+        0.0,             1.0 / fov, 0.0,                      0.0,
+        0.0,             0.0,       -(f + n) / (f - n),      -1.0,
+        0.0,             0.0,       -(2.0 * f * n) / (f - n), 0.0,
+    );
 }
 
 // -------------------------------------------------------------------------------------------------
