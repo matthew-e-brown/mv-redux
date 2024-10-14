@@ -542,13 +542,13 @@ export function normalize<T extends AnyVector>(v: T): T {
         let m: number;
         switch (v.type) {
             case 'vec4':
-                m = v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3];
+                m = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3]);
                 return ((m == 0) ? vec4(0) : vec4(v[0] / m, v[1] / m, v[2] / m, v[3] / m)) as T;
             case 'vec3':
-                m = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
+                m = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
                 return ((m == 0) ? vec3(0) : vec3(v[0] / m, v[1] / m, v[2] / m)) as T;
             case 'vec2':
-                m = v[0] * v[0] + v[1] * v[1];
+                m = Math.sqrt(v[0] * v[0] + v[1] * v[1]);
                 return ((m == 0) ? vec2(0) : vec2(v[0] / m, v[1] / m)) as T;
         }
     }
