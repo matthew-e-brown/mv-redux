@@ -225,12 +225,10 @@ export function lookAtMatrix(eyePosition: Vec3, target: Vec3, upVec: Vec3 = vec3
 
 /**
  * Constructs a _perspective projection matrix._
- * @param fovY The desired **vertical** field-of-view (**in radians**).
+ * @param fovY The desired **vertical** field-of-view, in **radians.**
  * @param aspectRatio The screen's aspect ratio (width over height).
- * @param near The near clipping-plane's distance from the camera. Anything closer than this
- * distance will be cut off.
- * @param far The far clipping-plane's distance from the camera. Anything further than this distance
- * will not be visible.
+ * @param near The near clipping-plane's distance from the camera.
+ * @param far The far clipping-plane's distance from the camera.
  *
  * @see {@link https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/projection-matrix-introduction.html}
  */
@@ -267,7 +265,7 @@ export function perspectiveMatrix(fovY: number, aspectRatio: number, near: numbe
 // -------------------------------------------------------------------------------------------------
 
 /**
- * Constructs an _orthographic projection matrix_.
+ * Constructs an _orthographic projection matrix._
  *
  * @see {@link https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/orthographic-projection-matrix.html}.
  */
@@ -439,6 +437,8 @@ export function scale(x: number, y: number, z: number) {
 }
 
 /**
+ * Constructs a _look-at matrix._
+ *
  * @deprecated This function has been renamed to {@linkcode lookAtMatrix} for consistency with the
  * other transformation matrix functions.
  */
@@ -447,6 +447,8 @@ export function lookAt(eye: Vec3, at: Vec3, up: Vec3): Mat4 {
 }
 
 /**
+ * Constructs an _orthographic projection matrix._
+ *
  * @deprecated This function has been renamed to {@linkcode orthographicMatrix} for consistency with
  * the other transformation matrix functions.
  */
@@ -455,8 +457,15 @@ export function ortho(left: number, right: number, bottom: number, top: number, 
 }
 
 /**
+ * Constructs a _perspective projection matrix._
+ *
  * @deprecated This function has been renamed to {@linkcode perspectiveMatrix} for consistency with
  * the other transformation matrix functions.
+ *
+ * @param fovY The desired **vertical** field-of-view, in **degrees.**
+ * @param aspectRatio The screen's aspect ratio (width over height).
+ * @param near The near clipping-plane's distance from the camera.
+ * @param far The far clipping-plane's distance from the camera.
  */
 export function perspective(fovY: number, aspect: number, near: number, far: number) {
     return perspectiveMatrix(radians(fovY), aspect, near, far);
