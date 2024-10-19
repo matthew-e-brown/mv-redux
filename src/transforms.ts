@@ -459,5 +459,5 @@ export function ortho(left: number, right: number, bottom: number, top: number, 
  * the other transformation matrix functions.
  */
 export function perspective(fovY: number, aspect: number, near: number, far: number) {
-    return perspectiveMatrix(fovY, aspect, near, far);
+    return perspectiveMatrix(radians(fovY), aspect, near, far);
 }
