@@ -63,7 +63,7 @@ export function rotationMatrix(axis: 'x' | 'y' | 'z', radians: number): Mat4;
 
 /**
  * Constructs a transformation matrix that will rotate points around an arbitrary axis.
- * @param axis A unit-vector that describes the direction of the axis to rotate around.
+ * @param axis A vector describing the direction of the axis to rotate around.
  * @param radians How far to rotate around the axis.
  */
 export function rotationMatrix(axis: Vec3, radians: number): Mat4;
@@ -107,9 +107,9 @@ export function rotationMatrix(axis: 'x' | 'y' | 'z' | Vec3, radians: number): M
         const [x, y, z] = normalize(axis);
         const omc = 1.0 - cos; // "one minus cosine"
         return mat4(
-            (cos + x * x * omc), (x * y * omc - z * sin), (x * z * omc + y * sin), 0.0,
-            (y * x * omc + z * sin), (cos + y * y * cos), (y * z * omc - x * sin), 0.0,
-            (z * x * omc - y * sin), (z * y * omc + x * sin), (cos + z * z * omc), 0.0,
+            (x * x * omc + cos    ), (x * y * omc + z * sin), (x * z * omc - y * sin), 0.0,
+            (x * y * omc - z * sin), (y * y * omc + cos    ), (y * z * omc + x * sin), 0.0,
+            (x * z * omc + y * sin), (y * z * omc - x * sin), (z * z * omc + cos    ), 0.0,
             0.0, 0.0, 0.0, 1.0,
         );
     }
